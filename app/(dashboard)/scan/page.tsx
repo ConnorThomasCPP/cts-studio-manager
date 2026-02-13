@@ -24,8 +24,8 @@ type Asset = {
   model: string | null
   serial_number: string | null
   photo_url: string | null
-  category?: { name: string }
-  home_location?: { name: string }
+  category: { name: string } | null
+  home_location: { name: string } | null
 }
 
 export default function ScanPage() {
