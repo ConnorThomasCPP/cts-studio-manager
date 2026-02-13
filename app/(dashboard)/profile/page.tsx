@@ -1,0 +1,314 @@
+/**
+ * User Profile Page
+ *
+ * Edit user profile including name, photo, and other details
+ */
+
+'use client'
+
+import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { toast } from 'sonner'
+import { Upload, User } from 'lucide-react'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import md5 from 'md5'
+
+type UserProfile = {
+  id: string
+  first_name: string | null
+  last_name: string | null
+  name: string | null
+  email: string
+  photo_url: string | null
+  role: string
+}
+
+function getGravatarUrl(email: string, size: number = 200): string {
+  const hash = md5(email.trim().toLowerCase())
+  return `https://www.gravatar.com/avatar/${hash}?s=${size}&d=mp`
+}
+
+export default function ProfilePage() {
+  const [profile, setProfile] = useState<UserProfile | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const supabase = createClient()
+
+  useEffect(() => {
+    loadProfile()
+  }, [])
+
+  async function loadProfile() {
+    setLoading(true)
+    try {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) throw new Error('Not authenticated')
+
+      const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .single()
+
+      if (error) throw error
+
+      setProfile({
+        ...data,
+        email: user.email || '',
+      })
+    } catch (error) {
+      console.error('Failed to load profile:', error)
+      toast.error('Failed to load profile')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  async function handleSaveProfile(formData: FormData) {
+    if (!profile) return
+
+    setSaving(true)
+    try {
+      const firstName = formData.get('first_name') as string
+      const lastName = formData.get('last_name') as string
+
+      // Update name to be the combination
+      const name = [firstName, lastName].filter(Boolean).join(' ')
+
+      const { error } = await supabase
+        .from('users')
+        .update({
+          first_name: firstName || null,
+          last_name: lastName || null,
+          name: name || null,
+        })
+        .eq('id', profile.id)
+
+      if (error) throw error
+
+      toast.success('Profile updated successfully')
+      loadProfile()
+    } catch (error: any) {
+      console.error('Failed to save profile:', error)
+      toast.error(error.message || 'Failed to save profile')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handlePhotoUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    if (!profile) return
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file')
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image must be less than 5MB')
+      return
+    }
+
+    setUploading(true)
+    try {
+      // Upload to Supabase Storage
+      const fileExt = file.name.split('.').pop()
+      const fileName = `${profile.id}.${fileExt}`
+      const filePath = `profile-photos/${fileName}`
+
+      const { error: uploadError } = await supabase.storage
+        .from('asset-photos')
+        .upload(filePath, file, { upsert: true })
+
+      if (uploadError) throw uploadError
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('asset-photos')
+        .getPublicUrl(filePath)
+
+      // Update profile
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ photo_url: publicUrl })
+        .eq('id', profile.id)
+
+      if (updateError) throw updateError
+
+      toast.success('Profile photo updated')
+      loadProfile()
+    } catch (error: any) {
+      console.error('Failed to upload photo:', error)
+      toast.error(error.message || 'Failed to upload photo')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  async function handleRemovePhoto() {
+    if (!profile) return
+
+    try {
+      const { error } = await supabase
+        .from('users')
+        .update({ photo_url: null })
+        .eq('id', profile.id)
+
+      if (error) throw error
+
+      toast.success('Profile photo removed')
+      loadProfile()
+    } catch (error: any) {
+      console.error('Failed to remove photo:', error)
+      toast.error(error.message || 'Failed to remove photo')
+    }
+  }
+
+  if (loading) {
+    return <div className="p-8">Loading...</div>
+  }
+
+  if (!profile) {
+    return <div className="p-8">Failed to load profile</div>
+  }
+
+  const displayPhotoUrl = profile.photo_url || getGravatarUrl(profile.email)
+  const initials = [profile.first_name?.[0], profile.last_name?.[0]]
+    .filter(Boolean)
+    .join('')
+    .toUpperCase() || profile.email[0].toUpperCase()
+
+  return (
+    <div className="max-w-2xl space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">Profile Settings</h1>
+        <p className="text-muted-foreground">Manage your profile information and photo</p>
+      </div>
+
+      {/* Profile Photo */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Profile Photo</CardTitle>
+          <CardDescription>
+            {profile.photo_url
+              ? 'Your custom profile photo'
+              : 'Using Gravatar (based on your email)'}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-6">
+            <Avatar className="w-24 h-24">
+              <AvatarImage src={displayPhotoUrl} alt={profile.name || profile.email} />
+              <AvatarFallback className="text-2xl">{initials}</AvatarFallback>
+            </Avatar>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={uploading}
+                  onClick={() => document.getElementById('photo-upload')?.click()}
+                >
+                  <Upload className="mr-2 h-4 w-4" />
+                  {uploading ? 'Uploading...' : 'Upload Photo'}
+                </Button>
+                {profile.photo_url && (
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    onClick={handleRemovePhoto}
+                  >
+                    Remove
+                  </Button>
+                )}
+              </div>
+              <input
+                id="photo-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handlePhotoUpload}
+              />
+              <p className="text-xs text-muted-foreground">
+                {profile.photo_url
+                  ? 'JPG, PNG or GIF. Max 5MB.'
+                  : 'Upload a custom photo or update your Gravatar at gravatar.com'}
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Profile Information */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Personal Information</CardTitle>
+          <CardDescription>Update your name and other details</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form action={handleSaveProfile} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="first_name">First Name</Label>
+                <Input
+                  id="first_name"
+                  name="first_name"
+                  placeholder="John"
+                  defaultValue={profile.first_name || ''}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="last_name">Last Name</Label>
+                <Input
+                  id="last_name"
+                  name="last_name"
+                  placeholder="Doe"
+                  defaultValue={profile.last_name || ''}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                value={profile.email}
+                disabled
+                className="bg-muted"
+              />
+              <p className="text-xs text-muted-foreground">
+                Email cannot be changed here. Contact an administrator to update your email.
+              </p>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="role">Role</Label>
+              <Input
+                id="role"
+                name="role"
+                value={profile.role}
+                disabled
+                className="bg-muted capitalize"
+              />
+            </div>
+
+            <Button type="submit" disabled={saving}>
+              {saving ? 'Saving...' : 'Save Changes'}
+            </Button>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  )
+}

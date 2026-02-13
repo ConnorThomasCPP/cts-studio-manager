@@ -1,0 +1,297 @@
+/**
+ * Database Types
+ *
+ * These types represent the Supabase database schema.
+ * TODO: Generate these automatically using: npx supabase gen types typescript --project-id your-project-id > types/database.ts
+ */
+
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export interface Database {
+  public: {
+    Tables: {
+      users: {
+        Row: {
+          id: string
+          name: string
+          role: 'admin' | 'engineer' | 'viewer'
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          name: string
+          role: 'admin' | 'engineer' | 'viewer'
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          role?: 'admin' | 'engineer' | 'viewer'
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      assets: {
+        Row: {
+          id: string
+          asset_code: string
+          name: string
+          category_id: string | null
+          brand: string | null
+          model: string | null
+          serial_number: string | null
+          status: 'available' | 'checked_out' | 'maintenance' | 'missing'
+          home_location_id: string | null
+          current_location_id: string | null
+          photo_url: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          asset_code: string
+          name: string
+          category_id?: string | null
+          brand?: string | null
+          model?: string | null
+          serial_number?: string | null
+          status?: 'available' | 'checked_out' | 'maintenance' | 'missing'
+          home_location_id?: string | null
+          current_location_id?: string | null
+          photo_url?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          asset_code?: string
+          name?: string
+          category_id?: string | null
+          brand?: string | null
+          model?: string | null
+          serial_number?: string | null
+          status?: 'available' | 'checked_out' | 'maintenance' | 'missing'
+          home_location_id?: string | null
+          current_location_id?: string | null
+          photo_url?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+      }
+      categories: {
+        Row: {
+          id: string
+          name: string
+          color: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          color?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          color?: string | null
+          created_at?: string
+        }
+      }
+      locations: {
+        Row: {
+          id: string
+          name: string
+          description: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          description?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          description?: string | null
+          created_at?: string
+        }
+      }
+      sessions: {
+        Row: {
+          id: string
+          session_name: string
+          client_name: string
+          engineer: string
+          start_time: string
+          end_time: string | null
+          status: 'planned' | 'active' | 'completed' | 'cancelled'
+          notes: string | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          session_name: string
+          client_name: string
+          engineer: string
+          start_time: string
+          end_time?: string | null
+          status?: 'planned' | 'active' | 'completed' | 'cancelled'
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          session_name?: string
+          client_name?: string
+          engineer?: string
+          start_time?: string
+          end_time?: string | null
+          status?: 'planned' | 'active' | 'completed' | 'cancelled'
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+      }
+      session_assets: {
+        Row: {
+          id: string
+          session_id: string
+          asset_id: string
+          checked_out_at: string
+          checked_in_at: string | null
+          check_out_condition: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          check_in_condition: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          notes: string | null
+        }
+        Insert: {
+          id?: string
+          session_id: string
+          asset_id: string
+          checked_out_at?: string
+          checked_in_at?: string | null
+          check_out_condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          check_in_condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          notes?: string | null
+        }
+        Update: {
+          id?: string
+          session_id?: string
+          asset_id?: string
+          checked_out_at?: string
+          checked_in_at?: string | null
+          check_out_condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          check_in_condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          notes?: string | null
+        }
+      }
+      transactions: {
+        Row: {
+          id: string
+          asset_id: string
+          session_id: string | null
+          type: 'check_out' | 'check_in' | 'status_change' | 'created' | 'updated'
+          timestamp: string
+          user_id: string
+          condition: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          from_status: string | null
+          to_status: string | null
+          from_location_id: string | null
+          to_location_id: string | null
+          note: string | null
+          metadata: Json | null
+        }
+        Insert: {
+          id?: string
+          asset_id: string
+          session_id?: string | null
+          type: 'check_out' | 'check_in' | 'status_change' | 'created' | 'updated'
+          timestamp?: string
+          user_id: string
+          condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          from_status?: string | null
+          to_status?: string | null
+          from_location_id?: string | null
+          to_location_id?: string | null
+          note?: string | null
+          metadata?: Json | null
+        }
+        Update: {
+          id?: string
+          asset_id?: string
+          session_id?: string | null
+          type?: 'check_out' | 'check_in' | 'status_change' | 'created' | 'updated'
+          timestamp?: string
+          user_id?: string
+          condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          from_status?: string | null
+          to_status?: string | null
+          from_location_id?: string | null
+          to_location_id?: string | null
+          note?: string | null
+          metadata?: Json | null
+        }
+      }
+    }
+    Views: {
+      [_ in never]: never
+    }
+    Functions: {
+      check_out_asset: {
+        Args: {
+          p_asset_id: string
+          p_session_id: string
+          p_user_id?: string
+          p_condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance'
+          p_note?: string
+        }
+        Returns: Json
+      }
+      check_in_asset: {
+        Args: {
+          p_asset_id: string
+          p_session_id?: string
+          p_user_id?: string
+          p_condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance'
+          p_note?: string
+        }
+        Returns: Json
+      }
+      can_complete_session: {
+        Args: {
+          p_session_id: string
+        }
+        Returns: Json
+      }
+      generate_asset_code: {
+        Args: {
+          p_category_name?: string
+        }
+        Returns: string
+      }
+    }
+    Enums: {
+      [_ in never]: never
+    }
+  }
+}
