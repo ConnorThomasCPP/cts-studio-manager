@@ -57,15 +57,20 @@ export default function AdminPage() {
   async function loadData() {
     setLoading(true)
     try {
-      const [locationsResult, categoriesResult, settingsResult] = await Promise.all([
+      const [locationsResult, categoriesResult] = await Promise.all([
         supabase.from('locations').select('*').order('name'),
         supabase.from('categories').select('*').order('name'),
-        supabase.from('settings').select('*').eq('key', 'anthropic_api_key').single(),
       ])
+
+      const settingsResult = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'anthropic_api_key')
+        .maybeSingle()
 
       if (locationsResult.data) setLocations(locationsResult.data)
       if (categoriesResult.data) setCategories(categoriesResult.data)
-      if (settingsResult.data) setApiKey(settingsResult.data.value || '')
+      if (settingsResult.data?.value) setApiKey(settingsResult.data.value)
     } catch (error) {
       console.error('Failed to load data:', error)
       toast.error('Failed to load settings')
