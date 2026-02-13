@@ -13,7 +13,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Plus, Trash2, Edit2, X } from 'lucide-react'
+import { Plus, Trash2, Edit2 } from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -62,15 +62,16 @@ export default function AdminPage() {
         supabase.from('categories').select('*').order('name'),
       ])
 
-      const settingsResult = await supabase
+      // Load API key separately
+      const { data: apiKeySetting } = await supabase
         .from('settings')
-        .select('value')
+        .select('*')
         .eq('key', 'anthropic_api_key')
         .maybeSingle()
 
       if (locationsResult.data) setLocations(locationsResult.data)
       if (categoriesResult.data) setCategories(categoriesResult.data)
-      if (settingsResult.data?.value) setApiKey(settingsResult.data.value)
+      if (apiKeySetting?.value) setApiKey(apiKeySetting.value)
     } catch (error) {
       console.error('Failed to load data:', error)
       toast.error('Failed to load settings')
