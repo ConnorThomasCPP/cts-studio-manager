@@ -100,8 +100,8 @@ export default async function AssetDetailPage({
                   className="mt-1"
                   variant="outline"
                   style={{
-                    borderColor: asset.categories.color,
-                    color: asset.categories.color,
+                    borderColor: asset.categories.color ?? undefined,
+                    color: asset.categories.color ?? undefined,
                   }}
                 >
                   {asset.categories.name}

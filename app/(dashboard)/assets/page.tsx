@@ -156,8 +156,8 @@ export default async function AssetsPage({
                         <Badge
                           variant="outline"
                           style={{
-                            borderColor: asset.categories.color,
-                            color: asset.categories.color,
+                            borderColor: asset.categories.color ?? undefined,
+                            color: asset.categories.color ?? undefined,
                           }}
                         >
                           {asset.categories.name}
