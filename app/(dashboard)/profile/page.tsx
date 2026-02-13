@@ -77,15 +77,15 @@ export default function ProfilePage() {
       const firstName = formData.get('first_name') as string
       const lastName = formData.get('last_name') as string
 
-      // Update name to be the combination
-      const name = [firstName, lastName].filter(Boolean).join(' ')
+      // Update name to be the combination (fallback to 'User' if both names are empty)
+      const name = [firstName, lastName].filter(Boolean).join(' ') || 'User'
 
       const { error } = await supabase
         .from('users')
         .update({
           first_name: firstName || null,
           last_name: lastName || null,
-          name: name || null,
+          name: name,
         })
         .eq('id', profile.id)
 
