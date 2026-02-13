@@ -189,11 +189,11 @@ export default async function AssetDetailPage({
           <CardContent className="space-y-2 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Created:</span>
-              <span>{new Date(asset.created_at).toLocaleString()}</span>
+              <span>{asset.created_at ? new Date(asset.created_at).toLocaleString() : 'N/A'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Last Updated:</span>
-              <span>{new Date(asset.updated_at).toLocaleString()}</span>
+              <span>{asset.updated_at ? new Date(asset.updated_at).toLocaleString() : 'N/A'}</span>
             </div>
             {asset.created_by_user && (
               <div className="flex justify-between">
