@@ -1,6 +1,6 @@
 # CTs Studio Manager
 
-A mobile-first inventory tracking system for recording studios, featuring barcode-based asset management, session tracking, and AI-powered equipment cost estimation.
+A comprehensive studio management platform for recording studios, featuring barcode-based asset management, session tracking, professional stem player with collaborative comments, and AI-powered equipment cost estimation.
 
 ## 🎯 Overview
 
@@ -11,35 +11,50 @@ CTs Studio Manager helps recording studios track equipment through barcode scann
 
 ## ✨ Features
 
-### Asset Management
+### 🎵 Professional Stem Player
+- ✅ DAW-style multi-track audio playback (inspired by splitter.fm)
+- ✅ Color-coded waveforms for each stem (vocals, drums, bass, etc.)
+- ✅ Individual stem controls: mute, solo, volume adjustment
+- ✅ Playback speed control (0.5x to 2x)
+- ✅ **Time-stamped collaborative comments** with emoji reactions (❤️, 🔥, 👍, ⚠️)
+- ✅ Comment mode for adding feedback at specific timestamps
+- ✅ Toggleable comment sidebar showing all comments across stems
+- ✅ Individual stem downloads
+- ✅ Synchronized multi-track playback with drift correction
+- ✅ Client/Project/Track hierarchy for organization
+
+### 📦 Asset Management
+- ✅ Sortable table view with columns: Asset Tag, Brand, Model, Price, Location, Status
+- ✅ Click column headers to sort (ascending → descending → default)
 - ✅ Complete CRUD operations for studio equipment
 - ✅ Code 128 barcode generation for each asset
 - ✅ Photo uploads with Supabase Storage
 - ✅ Category and location organization
-- ✅ Purchase value and replacement cost tracking
+- ✅ GBP (£) currency support for pricing
+- ✅ Replacement cost tracking and display
 - ✅ AI-powered replacement cost estimation (using Anthropic Claude)
 
-### Session Tracking
+### 📅 Session Tracking
 - ✅ Recording session management (planned → active → completed)
 - ✅ Client and engineer assignment
 - ✅ Asset check-out/check-in workflows
 - ✅ Session validation (prevents closing with unreturned assets)
 - ✅ Real-time session updates
 
-### Mobile Barcode Scanning
+### 📱 Mobile Barcode Scanning
 - ✅ Camera-based barcode scanning (html5-qrcode)
 - ✅ Manual asset code entry fallback
 - ✅ Quick check-out to active sessions
 - ✅ Asset condition tracking
 - ✅ Touch-optimized interface
 
-### User Management
+### 👥 User Management
 - ✅ Role-based access control (Admin, Engineer, Viewer)
 - ✅ Profile management with Gravatar support
 - ✅ Custom photo uploads
 - ✅ Authentication with Supabase Auth
 
-### Admin Features
+### ⚙️ Admin Features
 - ✅ Location and category management
 - ✅ System settings configuration
 - ✅ API key management (admin-only)
@@ -48,9 +63,10 @@ CTs Studio Manager helps recording studios track equipment through barcode scann
 ## 🛠 Tech Stack
 
 ### Frontend
-- **Framework:** Next.js 14.2 (App Router, React 18, TypeScript)
-- **Styling:** Tailwind CSS, shadcn/ui components
-- **State:** React hooks, Zustand (for scan state)
+- **Framework:** Next.js 16 (App Router, React 19, TypeScript)
+- **Styling:** Tailwind CSS with OKLCH colors, shadcn/ui components
+- **State:** React hooks, Zustand (player state, scan state)
+- **Audio:** Howler.js (multi-track playback), Web Audio API (waveform generation)
 - **Barcode:** html5-qrcode (scanning), bwip-js (generation)
 
 ### Backend
@@ -68,12 +84,23 @@ CTs Studio Manager helps recording studios track equipment through barcode scann
 ## 📁 Project Structure
 
 ```
-inventory-tracker/
+cts-studio-manager/
 ├── app/
 │   ├── (auth)/              # Authentication pages (login, signup)
 │   ├── (dashboard)/         # Protected dashboard pages
 │   │   ├── admin/           # Admin settings
-│   │   ├── assets/          # Asset management
+│   │   ├── assets/          # Asset management with sortable table
+│   │   ├── clients/         # Client management
+│   │   ├── projects/        # Project management (per client)
+│   │   ├── tracks/          # Track management with stem player
+│   │   │   └── [id]/
+│   │   │       └── components/  # Stem player components
+│   │   │           ├── StemPlayer.tsx
+│   │   │           ├── TransportControls.tsx
+│   │   │           ├── WaveformCanvas.tsx
+│   │   │           ├── CommentModal.tsx
+│   │   │           ├── CommentMarker.tsx
+│   │   │           └── CommentSidebar.tsx
 │   │   ├── profile/         # User profile
 │   │   ├── scan/            # Mobile barcode scanner
 │   │   ├── sessions/        # Session management
@@ -82,16 +109,27 @@ inventory-tracker/
 │       └── assets/
 │           └── find-replacement-cost/  # AI cost estimation
 ├── components/
+│   ├── assets/              # Asset components
+│   │   └── assets-table.tsx # Sortable table with column sorting
 │   └── ui/                  # shadcn/ui components
 ├── lib/
+│   ├── services/            # Service layer
+│   │   ├── asset-service.ts
+│   │   ├── client-service.ts
+│   │   ├── project-service.ts
+│   │   ├── track-service.ts
+│   │   └── stem-service.ts
+│   ├── stores/              # Zustand state management
+│   │   └── player-store.ts  # Audio player state
 │   └── supabase/
 │       ├── client.ts        # Browser-side Supabase client
 │       ├── server.ts        # Server-side Supabase client
-│       └── database.types.ts # Generated TypeScript types
+│       └── database.types.ts # Auto-generated TypeScript types
 ├── supabase/
 │   └── migrations/          # Database schema migrations
-├── middleware.ts            # Auth middleware
-└── types/                   # TypeScript type definitions
+├── middleware.ts            # Auth middleware (proxy.ts)
+└── types/
+    └── enhanced.ts          # Enhanced TypeScript types with stricter unions
 ```
 
 ## 🚀 Getting Started
@@ -200,14 +238,24 @@ Open [http://localhost:3000](http://localhost:3000) to see the app.
 
 ### Core Tables
 
+#### Asset Management
 - **users** - User profiles with roles (admin/engineer/viewer)
 - **assets** - Equipment inventory with barcodes and metadata
-- **sessions** - Recording sessions with client/engineer info
-- **transactions** - Immutable audit log of all asset movements
-- **session_assets** - Junction table for session-asset assignments
 - **categories** - Asset categories with color coding
 - **locations** - Physical storage locations
 - **settings** - System configuration (admin-only)
+
+#### Session Management
+- **sessions** - Recording sessions with client/engineer info
+- **transactions** - Immutable audit log of all asset movements
+- **session_assets** - Junction table for session-asset assignments
+
+#### Music Production
+- **clients** - Studio clients who own projects
+- **projects** - Client projects containing tracks
+- **tracks** - Individual songs/compositions with metadata (BPM, key, etc.)
+- **stems** - Individual audio files (vocals, drums, bass, etc.) with color coding
+- **stem_comments** - Time-stamped comments on stems for collaborative feedback
 
 ### Key Relationships
 
@@ -224,6 +272,13 @@ transactions
   ├─→ assets (asset_id)
   ├─→ users (user_id)
   └─→ sessions (session_id)
+
+clients
+  └─→ projects (client_id)
+      └─→ tracks (project_id)
+          └─→ stems (track_id)
+              └─→ stem_comments (stem_id)
+                  └─→ users (user_id)
 ```
 
 ### Database Functions
@@ -248,6 +303,78 @@ All tables have RLS policies enforcing role-based access:
 - Viewers: Read-only access
 
 ## 🎨 Key Features Implementation
+
+### Professional Stem Player
+
+DAW-style multi-track audio player with collaborative features:
+
+```typescript
+// Located in: app/(dashboard)/tracks/[id]/components/StemPlayer.tsx
+// Multi-track synchronization with Howler.js
+const howlers = useRef<Map<string, Howl>>(new Map())
+
+stems.forEach((stem) => {
+  const howl = new Howl({
+    src: [stem.file_url],
+    html5: true,
+    volume: stemVolumes[stem.id] ?? 1,
+    rate: playbackSpeed,
+    onload: () => setDuration(Math.max(duration, howl.duration()))
+  })
+  howlers.current.set(stem.id, howl)
+})
+
+// Drift correction - sync check every 100ms
+const syncInterval = setInterval(() => {
+  const positions = Array.from(howlers.current.values()).map(h => h.seek())
+  const avgPosition = positions.reduce((a, b) => a + b, 0) / positions.length
+
+  howlers.current.forEach((howl, index) => {
+    if (Math.abs(positions[index] - avgPosition) > 0.05) {
+      howl.seek(avgPosition) // Re-sync if drift > 50ms
+    }
+  })
+}, 100)
+```
+
+**Comment System:**
+```typescript
+// Time-stamped comments with emoji reactions
+interface StemComment {
+  id: string
+  stem_id: string
+  user_id: string
+  timestamp: number  // Playback position in seconds
+  content: string    // Text or emoji (❤️, 🔥, 👍, ⚠️)
+  created_at: string
+}
+
+// Comments appear as dots/emojis on waveform timeline
+// Click to add comment, hover to preview, sidebar for full list
+```
+
+### Sortable Assets Table
+
+Click column headers to sort assets by any field:
+
+```typescript
+// Located in: components/assets/assets-table.tsx
+const [sortField, setSortField] = useState<SortField | null>(null)
+const [sortDirection, setSortDirection] = useState<'asc' | 'desc' | null>(null)
+
+const handleSort = (field: SortField) => {
+  if (sortField === field) {
+    // Cycle: asc → desc → null
+    setSortDirection(sortDirection === 'asc' ? 'desc' :
+                     sortDirection === 'desc' ? null : 'asc')
+  } else {
+    setSortField(field)
+    setSortDirection('asc')
+  }
+}
+
+// Columns: Asset Name, Asset Tag, Brand, Model, Price (£), Location, Status
+```
 
 ### Barcode Scanning
 
@@ -353,14 +480,48 @@ npx supabase gen types typescript --project-id nmfqupzjhrlamyekfbqx > lib/supaba
 
 ## 📝 Common Tasks
 
+### Upload and Review Tracks
+
+1. **Create a Client:**
+   - Go to `/clients/new`
+   - Enter client name and contact details
+
+2. **Create a Project:**
+   - Go to `/projects/new`
+   - Select client and enter project name
+
+3. **Upload a Track with Stems:**
+   - Go to `/tracks/new`
+   - Select project, enter track details (name, BPM, key)
+   - Upload stems (vocals, drums, bass, etc.)
+   - Each stem gets a color for visual distinction
+
+4. **Play and Comment:**
+   - Open track player at `/tracks/[id]`
+   - Use transport controls to play/pause
+   - Click **comment mode** button (💬)
+   - Click on waveform to add comments or emoji reactions
+   - Use sidebar to view all comments
+   - Solo or mute individual stems
+   - Adjust playback speed (0.5x to 2x)
+   - Download individual stems
+
 ### Add a New Asset
 
 1. Go to `/assets/new`
 2. Fill in asset details
 3. Upload photo (optional)
 4. Click "Generate" for auto-generated asset code
-5. Use "Find Cost" for AI-powered price estimation
+5. Enter replacement cost in £ (or use "Find Cost" for AI estimation)
 6. Submit
+
+### Browse and Sort Assets
+
+1. Go to `/assets`
+2. View all assets in sortable table
+3. Click column headers to sort:
+   - Asset Tag, Brand, Model, Price, Location, Status
+4. Use filters to show only Available/Checked Out/Maintenance
 
 ### Start a Recording Session
 
