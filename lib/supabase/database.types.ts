@@ -1,3 +1,10 @@
+/**
+ * Database Types for Supabase Client
+ *
+ * These types represent the Supabase database schema.
+ * Auto-generated from the database schema.
+ */
+
 export type Json =
   | string
   | number
@@ -14,577 +21,528 @@ export type Database = {
   }
   public: {
     Tables: {
-      assets: {
+      users: {
         Row: {
-          asset_code: string
-          brand: string | null
-          category_id: string | null
-          created_at: string | null
-          created_by: string | null
-          current_location_id: string | null
-          home_location_id: string | null
           id: string
-          model: string | null
           name: string
-          notes: string | null
-          photo_url: string | null
-          purchase_value: number | null
-          replacement_cost: number | null
-          replacement_cost_updated_at: string | null
-          serial_number: string | null
-          status: string
-          updated_at: string | null
+          role: 'admin' | 'engineer' | 'viewer'
+          created_at: string
+          updated_at: string
         }
         Insert: {
-          asset_code: string
-          brand?: string | null
-          category_id?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          current_location_id?: string | null
-          home_location_id?: string | null
-          id?: string
-          model?: string | null
+          id: string
           name: string
-          notes?: string | null
-          photo_url?: string | null
-          purchase_value?: number | null
-          replacement_cost?: number | null
-          replacement_cost_updated_at?: string | null
-          serial_number?: string | null
-          status?: string
-          updated_at?: string | null
+          role: 'admin' | 'engineer' | 'viewer'
+          created_at?: string
+          updated_at?: string
         }
         Update: {
-          asset_code?: string
-          brand?: string | null
-          category_id?: string | null
-          created_at?: string | null
-          created_by?: string | null
-          current_location_id?: string | null
-          home_location_id?: string | null
           id?: string
-          model?: string | null
           name?: string
-          notes?: string | null
-          photo_url?: string | null
-          purchase_value?: number | null
-          replacement_cost?: number | null
-          replacement_cost_updated_at?: string | null
-          serial_number?: string | null
-          status?: string
-          updated_at?: string | null
+          role?: 'admin' | 'engineer' | 'viewer'
+          created_at?: string
+          updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "assets_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "categories"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "assets_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "assets_current_location_id_fkey"
-            columns: ["current_location_id"]
-            isOneToOne: false
-            referencedRelation: "locations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "assets_home_location_id_fkey"
-            columns: ["home_location_id"]
-            isOneToOne: false
-            referencedRelation: "locations"
-            referencedColumns: ["id"]
-          },
-        ]
+      }
+      assets: {
+        Row: {
+          id: string
+          asset_code: string
+          name: string
+          category_id: string | null
+          brand: string | null
+          model: string | null
+          serial_number: string | null
+          status: 'available' | 'checked_out' | 'maintenance' | 'missing'
+          home_location_id: string | null
+          current_location_id: string | null
+          photo_url: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          asset_code: string
+          name: string
+          category_id?: string | null
+          brand?: string | null
+          model?: string | null
+          serial_number?: string | null
+          status?: 'available' | 'checked_out' | 'maintenance' | 'missing'
+          home_location_id?: string | null
+          current_location_id?: string | null
+          photo_url?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          asset_code?: string
+          name?: string
+          category_id?: string | null
+          brand?: string | null
+          model?: string | null
+          serial_number?: string | null
+          status?: 'available' | 'checked_out' | 'maintenance' | 'missing'
+          home_location_id?: string | null
+          current_location_id?: string | null
+          photo_url?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
       }
       categories: {
         Row: {
-          color: string | null
-          created_at: string | null
           id: string
           name: string
+          color: string | null
+          created_at: string
         }
         Insert: {
-          color?: string | null
-          created_at?: string | null
           id?: string
           name: string
+          color?: string | null
+          created_at?: string
         }
         Update: {
-          color?: string | null
-          created_at?: string | null
           id?: string
           name?: string
+          color?: string | null
+          created_at?: string
         }
-        Relationships: []
       }
       locations: {
         Row: {
-          created_at: string | null
-          description: string | null
           id: string
           name: string
+          description: string | null
+          created_at: string
         }
         Insert: {
-          created_at?: string | null
-          description?: string | null
           id?: string
           name: string
+          description?: string | null
+          created_at?: string
         }
         Update: {
-          created_at?: string | null
-          description?: string | null
           id?: string
           name?: string
+          description?: string | null
+          created_at?: string
         }
-        Relationships: []
-      }
-      session_assets: {
-        Row: {
-          asset_id: string
-          check_in_condition: string | null
-          check_out_condition: string | null
-          checked_in_at: string | null
-          checked_out_at: string
-          id: string
-          notes: string | null
-          session_id: string
-        }
-        Insert: {
-          asset_id: string
-          check_in_condition?: string | null
-          check_out_condition?: string | null
-          checked_in_at?: string | null
-          checked_out_at?: string
-          id?: string
-          notes?: string | null
-          session_id: string
-        }
-        Update: {
-          asset_id?: string
-          check_in_condition?: string | null
-          check_out_condition?: string | null
-          checked_in_at?: string | null
-          checked_out_at?: string
-          id?: string
-          notes?: string | null
-          session_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "session_assets_asset_id_fkey"
-            columns: ["asset_id"]
-            isOneToOne: false
-            referencedRelation: "assets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "session_assets_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       sessions: {
         Row: {
-          client_name: string
-          created_at: string | null
-          created_by: string | null
-          end_time: string | null
-          engineer: string
           id: string
-          notes: string | null
           session_name: string
+          client_name: string
+          engineer: string
           start_time: string
-          status: string
-          updated_at: string | null
+          end_time: string | null
+          status: 'planned' | 'active' | 'completed' | 'cancelled'
+          notes: string | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
         }
         Insert: {
-          client_name: string
-          created_at?: string | null
-          created_by?: string | null
-          end_time?: string | null
-          engineer: string
           id?: string
-          notes?: string | null
           session_name: string
+          client_name: string
+          engineer: string
           start_time: string
-          status?: string
-          updated_at?: string | null
+          end_time?: string | null
+          status?: 'planned' | 'active' | 'completed' | 'cancelled'
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
         }
         Update: {
-          client_name?: string
-          created_at?: string | null
-          created_by?: string | null
-          end_time?: string | null
-          engineer?: string
           id?: string
-          notes?: string | null
           session_name?: string
+          client_name?: string
+          engineer?: string
           start_time?: string
-          status?: string
-          updated_at?: string | null
+          end_time?: string | null
+          status?: 'planned' | 'active' | 'completed' | 'cancelled'
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "sessions_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+      }
+      session_assets: {
+        Row: {
+          id: string
+          session_id: string
+          asset_id: string
+          checked_out_at: string
+          checked_in_at: string | null
+          check_out_condition: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          check_in_condition: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          notes: string | null
+        }
+        Insert: {
+          id?: string
+          session_id: string
+          asset_id: string
+          checked_out_at?: string
+          checked_in_at?: string | null
+          check_out_condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          check_in_condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          notes?: string | null
+        }
+        Update: {
+          id?: string
+          session_id?: string
+          asset_id?: string
+          checked_out_at?: string
+          checked_in_at?: string | null
+          check_out_condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          check_in_condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          notes?: string | null
+        }
       }
       settings: {
         Row: {
-          description: string | null
+          id: string
           key: string
-          updated_at: string | null
-          updated_by: string | null
-          value: string | null
+          value: Json
+          created_at: string
+          updated_at: string
         }
         Insert: {
-          description?: string | null
+          id?: string
           key: string
-          updated_at?: string | null
-          updated_by?: string | null
-          value?: string | null
+          value: Json
+          created_at?: string
+          updated_at?: string
         }
         Update: {
-          description?: string | null
+          id?: string
           key?: string
-          updated_at?: string | null
-          updated_by?: string | null
-          value?: string | null
+          value?: Json
+          created_at?: string
+          updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "settings_updated_by_fkey"
-            columns: ["updated_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
       }
       transactions: {
         Row: {
-          asset_id: string
-          condition: string | null
-          from_location_id: string | null
-          from_status: string | null
           id: string
-          metadata: Json | null
-          note: string | null
+          asset_id: string
           session_id: string | null
+          type: 'check_out' | 'check_in' | 'status_change' | 'created' | 'updated'
           timestamp: string
-          to_location_id: string | null
+          user_id: string
+          condition: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          from_status: string | null
           to_status: string | null
-          type: string
-          user_id: string
+          from_location_id: string | null
+          to_location_id: string | null
+          note: string | null
+          metadata: Json | null
         }
         Insert: {
+          id?: string
           asset_id: string
-          condition?: string | null
-          from_location_id?: string | null
-          from_status?: string | null
-          id?: string
-          metadata?: Json | null
-          note?: string | null
           session_id?: string | null
+          type: 'check_out' | 'check_in' | 'status_change' | 'created' | 'updated'
           timestamp?: string
-          to_location_id?: string | null
-          to_status?: string | null
-          type: string
           user_id: string
+          condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          from_status?: string | null
+          to_status?: string | null
+          from_location_id?: string | null
+          to_location_id?: string | null
+          note?: string | null
+          metadata?: Json | null
         }
         Update: {
-          asset_id?: string
-          condition?: string | null
-          from_location_id?: string | null
-          from_status?: string | null
           id?: string
-          metadata?: Json | null
-          note?: string | null
+          asset_id?: string
           session_id?: string | null
+          type?: 'check_out' | 'check_in' | 'status_change' | 'created' | 'updated'
           timestamp?: string
-          to_location_id?: string | null
-          to_status?: string | null
-          type?: string
           user_id?: string
+          condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance' | null
+          from_status?: string | null
+          to_status?: string | null
+          from_location_id?: string | null
+          to_location_id?: string | null
+          note?: string | null
+          metadata?: Json | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "transactions_asset_id_fkey"
-            columns: ["asset_id"]
-            isOneToOne: false
-            referencedRelation: "assets"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transactions_from_location_id_fkey"
-            columns: ["from_location_id"]
-            isOneToOne: false
-            referencedRelation: "locations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transactions_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "sessions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transactions_to_location_id_fkey"
-            columns: ["to_location_id"]
-            isOneToOne: false
-            referencedRelation: "locations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transactions_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
       }
-      users: {
+      clients: {
         Row: {
-          created_at: string | null
-          first_name: string | null
           id: string
-          last_name: string | null
           name: string
-          photo_url: string | null
-          role: string
-          updated_at: string | null
+          email: string | null
+          phone: string | null
+          company: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
         }
         Insert: {
-          created_at?: string | null
-          first_name?: string | null
-          id: string
-          last_name?: string | null
+          id?: string
           name: string
-          photo_url?: string | null
-          role: string
-          updated_at?: string | null
+          email?: string | null
+          phone?: string | null
+          company?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
         }
         Update: {
-          created_at?: string | null
-          first_name?: string | null
           id?: string
-          last_name?: string | null
           name?: string
-          photo_url?: string | null
-          role?: string
-          updated_at?: string | null
+          email?: string | null
+          phone?: string | null
+          company?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
         }
-        Relationships: []
+      }
+      projects: {
+        Row: {
+          id: string
+          client_id: string
+          name: string
+          description: string | null
+          status: 'planning' | 'active' | 'review' | 'completed' | 'archived'
+          deadline: string | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          client_id: string
+          name: string
+          description?: string | null
+          status?: 'planning' | 'active' | 'review' | 'completed' | 'archived'
+          deadline?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          client_id?: string
+          name?: string
+          description?: string | null
+          status?: 'planning' | 'active' | 'review' | 'completed' | 'archived'
+          deadline?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+      }
+      tracks: {
+        Row: {
+          id: string
+          project_id: string
+          name: string
+          description: string | null
+          bpm: number | null
+          key: string | null
+          duration: number | null
+          waveform_data: Json | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          name: string
+          description?: string | null
+          bpm?: number | null
+          key?: string | null
+          duration?: number | null
+          waveform_data?: Json | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          name?: string
+          description?: string | null
+          bpm?: number | null
+          key?: string | null
+          duration?: number | null
+          waveform_data?: Json | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+      }
+      stems: {
+        Row: {
+          id: string
+          track_id: string
+          name: string
+          type: 'vocals' | 'drums' | 'bass' | 'guitar' | 'keys' | 'synth' | 'fx' | 'other' | null
+          color: string
+          icon: string
+          file_path: string
+          file_size: number | null
+          mime_type: string | null
+          duration: number | null
+          waveform_data: Json | null
+          sort_order: number
+          download_count: number
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          track_id: string
+          name: string
+          type?: 'vocals' | 'drums' | 'bass' | 'guitar' | 'keys' | 'synth' | 'fx' | 'other' | null
+          color?: string
+          icon?: string
+          file_path: string
+          file_size?: number | null
+          mime_type?: string | null
+          duration?: number | null
+          waveform_data?: Json | null
+          sort_order?: number
+          download_count?: number
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          track_id?: string
+          name?: string
+          type?: 'vocals' | 'drums' | 'bass' | 'guitar' | 'keys' | 'synth' | 'fx' | 'other' | null
+          color?: string
+          icon?: string
+          file_path?: string
+          file_size?: number | null
+          mime_type?: string | null
+          duration?: number | null
+          waveform_data?: Json | null
+          sort_order?: number
+          download_count?: number
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+      }
+      stem_comments: {
+        Row: {
+          id: string
+          stem_id: string
+          user_id: string
+          timestamp: number
+          content: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          stem_id: string
+          user_id: string
+          timestamp: number
+          content: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          stem_id?: string
+          user_id?: string
+          timestamp?: number
+          content?: string
+          created_at?: string
+        }
       }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      can_complete_session: { Args: { p_session_id: string }; Returns: Json }
-      check_in_asset: {
-        Args: {
-          p_asset_id: string
-          p_condition?: string
-          p_note?: string
-          p_session_id?: string
-          p_user_id?: string
-        }
-        Returns: Json
-      }
       check_out_asset: {
         Args: {
           p_asset_id: string
-          p_condition?: string
-          p_note?: string
           p_session_id: string
           p_user_id?: string
+          p_condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance'
+          p_note?: string
+        }
+        Returns: Json
+      }
+      check_in_asset: {
+        Args: {
+          p_asset_id: string
+          p_session_id?: string
+          p_user_id?: string
+          p_condition?: 'good' | 'fair' | 'damaged' | 'needs_maintenance'
+          p_note?: string
+        }
+        Returns: Json
+      }
+      can_complete_session: {
+        Args: {
+          p_session_id: string
         }
         Returns: Json
       }
       generate_asset_code: {
-        Args: { p_category_name?: string }
+        Args: {
+          p_category_name?: string
+        }
         Returns: string
       }
-      get_active_session_assets: {
-        Args: { p_session_id: string }
-        Returns: {
-          asset_code: string
-          asset_id: string
-          asset_name: string
-          brand: string
-          check_in_condition: string
-          check_out_condition: string
-          checked_in_at: string
-          checked_out_at: string
-          model: string
-          notes: string
-        }[]
-      }
-      get_asset_history: {
-        Args: { p_asset_id: string; p_limit?: number }
-        Returns: {
-          condition: string
+      get_track_stems_with_comments: {
+        Args: {
+          track_uuid: string
+        }
+        Returns: Array<{
+          id: string
+          track_id: string
+          name: string
+          type: string | null
+          color: string
+          icon: string
+          file_path: string
+          file_size: number | null
+          mime_type: string | null
+          duration: number | null
+          waveform_data: Json | null
+          sort_order: number
+          download_count: number
+          comment_count: number
           created_at: string
-          from_status: string
-          metadata: Json
-          note: string
-          session_name: string
-          to_status: string
-          transaction_id: string
-          type: string
-          user_name: string
-        }[]
+          updated_at: string
+          created_by: string | null
+        }>
       }
-      get_user_role: { Args: never; Returns: string }
+      increment_stem_download: {
+        Args: {
+          stem_uuid: string
+        }
+        Returns: void
+      }
     }
     Enums: {
       [_ in never]: never
     }
-    CompositeTypes: {
-      [_ in never]: never
-    }
   }
 }
-
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
-
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
-
-export type Tables<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
-      Row: infer R
-    }
-    ? R
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-        Row: infer R
-      }
-      ? R
-      : never
-    : never
-
-export type TablesInsert<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Insert: infer I
-    }
-    ? I
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Insert: infer I
-      }
-      ? I
-      : never
-    : never
-
-export type TablesUpdate<
-  DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
-    | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-    : never = never,
-> = DefaultSchemaTableNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-      Update: infer U
-    }
-    ? U
-    : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-        Update: infer U
-      }
-      ? U
-      : never
-    : never
-
-export type Enums<
-  DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
-    | { schema: keyof DatabaseWithoutInternals },
-  EnumName extends DefaultSchemaEnumNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-    : never = never,
-> = DefaultSchemaEnumNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-    : never
-
-export type CompositeTypes<
-  PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
-    | { schema: keyof DatabaseWithoutInternals },
-  CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
-    schema: keyof DatabaseWithoutInternals
-  }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-    : never = never,
-> = PublicCompositeTypeNameOrOptions extends {
-  schema: keyof DatabaseWithoutInternals
-}
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-    : never
-
-export const Constants = {
-  public: {
-    Enums: {},
-  },
-} as const
