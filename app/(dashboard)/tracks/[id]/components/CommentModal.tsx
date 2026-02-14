@@ -102,6 +102,11 @@ export default function CommentModal({
     }
   }
 
+  const handleEmojiClick = (emoji: string) => {
+    onSave(emoji)
+    onClose()
+  }
+
   if (!isOpen) return null
 
   const formatTime = (seconds: number) => {
@@ -138,6 +143,50 @@ export default function CommentModal({
             onClick={onClose}
           >
             <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Quick emoji reactions */}
+        <div className="flex gap-2 mb-3">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 px-3 text-lg hover:scale-110 transition-transform"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => handleEmojiClick('❤️')}
+            title="Love it"
+          >
+            ❤️
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 px-3 text-lg hover:scale-110 transition-transform"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => handleEmojiClick('🔥')}
+            title="Fire"
+          >
+            🔥
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 px-3 text-lg hover:scale-110 transition-transform"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => handleEmojiClick('👍')}
+            title="Thumbs up"
+          >
+            👍
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 px-3 text-lg hover:scale-110 transition-transform"
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => handleEmojiClick('⚠️')}
+            title="Needs attention"
+          >
+            ⚠️
           </Button>
         </div>
 

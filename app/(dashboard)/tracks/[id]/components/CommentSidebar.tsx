@@ -77,7 +77,7 @@ export default function CommentSidebar({
           commentsWithStemInfo.map((comment) => (
             <div
               key={comment.id}
-              className="group relative bg-accent/50 hover:bg-accent rounded-lg p-3 cursor-pointer transition-colors"
+              className="group relative border border-border/50 hover:border-border rounded-lg p-3 cursor-pointer transition-colors"
               onClick={() => onSeek(comment.timestamp)}
               onMouseEnter={() => setHoveredComment(comment.id)}
               onMouseLeave={() => setHoveredComment(null)}
