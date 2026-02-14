@@ -41,6 +41,7 @@ export default async function DashboardLayout({
     name: profile?.name || user.email?.split('@')[0] || 'User',
     email: user.email || '',
     role: profile?.role || 'viewer',
+    photo_url: profile?.photo_url || null,
   }
 
   return <AppLayout user={userData}>{children}</AppLayout>

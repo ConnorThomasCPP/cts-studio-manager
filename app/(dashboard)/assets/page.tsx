@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { AssetsTable } from '@/components/assets/assets-table'
+import { ScanBarcode } from 'lucide-react'
 
 export default async function AssetsPage({
   searchParams,
@@ -59,9 +60,17 @@ export default async function AssetsPage({
             Manage your studio equipment inventory
           </p>
         </div>
-        <Button asChild>
-          <Link href="/assets/new">Add Asset</Link>
-        </Button>
+        <div className="flex gap-2">
+          <Button asChild variant="outline">
+            <Link href="/scan">
+              <ScanBarcode className="mr-2 h-4 w-4" />
+              Scan Asset
+            </Link>
+          </Button>
+          <Button asChild>
+            <Link href="/assets/new">Add Asset</Link>
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

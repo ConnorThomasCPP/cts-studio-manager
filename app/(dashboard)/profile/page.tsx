@@ -13,9 +13,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { toast } from 'sonner'
-import { Upload, User } from 'lucide-react'
+import { Upload, User, Calendar, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
+import Link from 'next/link'
 import md5 from 'md5'
+import type { CalendarConnection } from '@/types/enhanced'
 
 type UserProfile = {
   id: string
@@ -37,10 +40,13 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [calendarConnections, setCalendarConnections] = useState<CalendarConnection[]>([])
+  const [loadingCalendars, setLoadingCalendars] = useState(true)
   const supabase = createClient()
 
   useEffect(() => {
     loadProfile()
+    loadCalendarConnections()
   }, [])
 
   async function loadProfile() {
@@ -67,6 +73,27 @@ export default function ProfilePage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  async function loadCalendarConnections() {
+    setLoadingCalendars(true)
+    try {
+      const response = await fetch('/api/calendar/connections')
+      if (!response.ok) {
+        throw new Error('Failed to fetch connections')
+      }
+      const data = await response.json()
+      setCalendarConnections(data)
+    } catch (error) {
+      console.error('Failed to load calendar connections:', error)
+      // Don't show error toast, just silently fail
+    } finally {
+      setLoadingCalendars(false)
+    }
+  }
+
+  function handleConnectCalendar(provider: 'google' | 'microsoft') {
+    window.location.href = `/api/calendar/connect/${provider}`
   }
 
   async function handleSaveProfile(formData: FormData) {
@@ -307,6 +334,104 @@ export default function ProfilePage() {
               {saving ? 'Saving...' : 'Save Changes'}
             </Button>
           </form>
+        </CardContent>
+      </Card>
+
+      {/* Calendar Connections */}
+      <Card>
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Calendar Integration</CardTitle>
+              <CardDescription>
+                Connect your calendar to sync studio sessions
+              </CardDescription>
+            </div>
+            <Link href="/settings/calendar">
+              <Button variant="outline" size="sm">
+                Manage Calendars
+              </Button>
+            </Link>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {loadingCalendars ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          ) : calendarConnections.length > 0 ? (
+            <div className="space-y-3">
+              {calendarConnections.map((connection) => (
+                <div
+                  key={connection.id}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
+                      <Calendar className="h-4 w-4 text-primary" />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">
+                          {connection.provider_account_email}
+                        </span>
+                        <Badge
+                          variant={
+                            connection.provider === 'google'
+                              ? 'default'
+                              : 'secondary'
+                          }
+                          className="text-xs"
+                        >
+                          {connection.provider}
+                        </Badge>
+                      </div>
+                      <p className="text-xs text-muted-foreground">
+                        {connection.calendar_name}
+                      </p>
+                    </div>
+                  </div>
+                  {connection.sync_enabled ? (
+                    <Badge variant="outline" className="gap-1">
+                      <CheckCircle className="h-3 w-3" />
+                      Active
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="gap-1">
+                      <AlertCircle className="h-3 w-3" />
+                      Paused
+                    </Badge>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-3" />
+              <p className="text-sm text-muted-foreground mb-4">
+                No calendars connected
+              </p>
+              <div className="flex flex-col sm:flex-row gap-2 justify-center">
+                <Button
+                  onClick={() => handleConnectCalendar('google')}
+                  variant="outline"
+                  size="sm"
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Connect Google Calendar
+                </Button>
+                <Button
+                  onClick={() => handleConnectCalendar('microsoft')}
+                  variant="outline"
+                  size="sm"
+                  disabled
+                >
+                  <Calendar className="mr-2 h-4 w-4" />
+                  Connect Outlook (Coming Soon)
+                </Button>
+              </div>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

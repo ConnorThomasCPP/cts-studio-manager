@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Package,
@@ -12,16 +13,25 @@ import {
   ScrollText,
   Settings,
   Folder,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 
 const navItems = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { to: "/assets", icon: Package, label: "Assets" },
+  {
+    to: "/assets",
+    icon: Package,
+    label: "Assets",
+    submenu: [
+      { to: "/assets", label: "All Assets" },
+      { to: "/scan", icon: ScanBarcode, label: "Scanner" },
+    ]
+  },
   { to: "/sessions", icon: CalendarClock, label: "Sessions" },
   { to: "/clients", icon: Users, label: "Clients" },
   { to: "/projects", icon: Folder, label: "Projects" },
   { to: "/tracks", icon: Music, label: "Tracks" },
-  { to: "/scan", icon: ScanBarcode, label: "Scanner" },
   { to: "/transactions", icon: ScrollText, label: "Transactions" },
   { to: "/admin", icon: Settings, label: "Settings" },
 ];
@@ -29,15 +39,17 @@ const navItems = [
 interface AppSidebarProps {
   collapsed: boolean;
   onToggle?: () => void;
-  user?: {
-    name?: string;
-    email?: string;
-    role?: string;
-  };
 }
 
-export function AppSidebar({ collapsed, user }: AppSidebarProps) {
+export function AppSidebar({ collapsed }: AppSidebarProps) {
   const pathname = usePathname();
+  const [expandedItems, setExpandedItems] = useState<string[]>(["/assets"]);
+
+  const toggleExpanded = (to: string) => {
+    setExpandedItems(prev =>
+      prev.includes(to) ? prev.filter(item => item !== to) : [...prev, to]
+    );
+  };
 
   return (
     <aside
@@ -66,43 +78,72 @@ export function AppSidebar({ collapsed, user }: AppSidebarProps) {
       <nav className="flex-1 space-y-1 p-3">
         {navItems.map((item) => {
           const isActive = pathname === item.to || pathname?.startsWith(item.to + "/");
+          const isExpanded = expandedItems.includes(item.to);
+          const hasSubmenu = item.submenu && item.submenu.length > 0;
+
           return (
-            <Link
-              key={item.to}
-              href={item.to}
-              className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                isActive
-                  ? "bg-primary/10 text-primary"
-                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-              }`}
-            >
-              <item.icon className="h-5 w-5 shrink-0" />
-              {!collapsed && <span>{item.label}</span>}
-            </Link>
+            <div key={item.to}>
+              {hasSubmenu ? (
+                <>
+                  <button
+                    onClick={() => toggleExpanded(item.to)}
+                    className={`w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                      isActive
+                        ? "bg-primary/10 text-primary"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                    }`}
+                  >
+                    <item.icon className="h-5 w-5 shrink-0" />
+                    {!collapsed && (
+                      <>
+                        <span className="flex-1 text-left">{item.label}</span>
+                        {isExpanded ? (
+                          <ChevronDown className="h-4 w-4 shrink-0" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4 shrink-0" />
+                        )}
+                      </>
+                    )}
+                  </button>
+                  {!collapsed && isExpanded && (
+                    <div className="ml-4 mt-1 space-y-1">
+                      {item.submenu.map((subitem) => {
+                        const isSubActive = pathname === subitem.to;
+                        return (
+                          <Link
+                            key={subitem.to}
+                            href={subitem.to}
+                            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
+                              isSubActive
+                                ? "bg-primary/10 text-primary"
+                                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                            }`}
+                          >
+                            {subitem.icon && <subitem.icon className="h-4 w-4 shrink-0" />}
+                            <span>{subitem.label}</span>
+                          </Link>
+                        );
+                      })}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <Link
+                  href={item.to}
+                  className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+                    isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  }`}
+                >
+                  <item.icon className="h-5 w-5 shrink-0" />
+                  {!collapsed && <span>{item.label}</span>}
+                </Link>
+              )}
+            </div>
           );
         })}
       </nav>
-
-      {/* Footer */}
-      {user && (
-        <div className="border-t border-sidebar-border p-3">
-          <div className="flex items-center gap-3 rounded-lg px-3 py-2">
-            <div className="h-8 w-8 shrink-0 rounded-full bg-surface-2 flex items-center justify-center text-xs font-mono text-muted-foreground">
-              {user.name?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
-            </div>
-            {!collapsed && (
-              <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-foreground">
-                  {user.name || "User"}
-                </p>
-                <p className="truncate text-xs text-muted-foreground">
-                  {user.role || "viewer"}
-                </p>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </aside>
   );
 }
@@ -110,7 +151,14 @@ export function AppSidebar({ collapsed, user }: AppSidebarProps) {
 /* Mobile bottom nav */
 export function MobileNav() {
   const pathname = usePathname();
-  const mobileItems = navItems.slice(0, 5);
+  // Include Scanner in mobile nav by flattening submenu items
+  const mobileItems = [
+    navItems[0], // Dashboard
+    navItems[1], // Assets
+    { to: "/scan", icon: ScanBarcode, label: "Scanner" }, // Scanner from submenu
+    navItems[2], // Sessions
+    navItems[3], // Clients
+  ];
 
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 flex h-16 items-center justify-around border-t border-sidebar-border bg-sidebar-background md:hidden">

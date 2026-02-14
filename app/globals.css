@@ -123,3 +123,110 @@
     box-shadow: 0 0 20px -5px oklch(0.58 0.18 155 / 0.3);
   }
 }
+
+/* React Big Calendar custom styles for dark theme */
+.calendar-container .rbc-calendar {
+  font-family: 'Inter', sans-serif;
+}
+
+.calendar-container .rbc-header {
+  padding: 12px 8px;
+  font-weight: 600;
+  border-bottom: 2px solid oklch(0.22 0.01 255);
+  background: oklch(0.16 0.01 255);
+  color: oklch(0.85 0.01 255);
+}
+
+.calendar-container .rbc-month-view,
+.calendar-container .rbc-time-view {
+  background: oklch(0.13 0.01 255);
+  border: 1px solid oklch(0.22 0.01 255);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.calendar-container .rbc-day-bg {
+  border-left: 1px solid oklch(0.22 0.01 255);
+}
+
+.calendar-container .rbc-month-row {
+  border-top: 1px solid oklch(0.22 0.01 255);
+}
+
+.calendar-container .rbc-off-range-bg {
+  background: oklch(0.10 0.01 255);
+}
+
+.calendar-container .rbc-today {
+  background: oklch(0.18 0.05 250);
+}
+
+.calendar-container .rbc-event {
+  padding: 2px 6px;
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.calendar-container .rbc-event:hover {
+  opacity: 0.8;
+}
+
+.calendar-container .rbc-event-label {
+  font-size: 11px;
+}
+
+.calendar-container .rbc-date-cell {
+  padding: 4px 8px;
+  text-align: right;
+}
+
+.calendar-container .rbc-time-slot {
+  border-top: 1px solid oklch(0.22 0.01 255);
+}
+
+.calendar-container .rbc-time-header-content {
+  border-left: 1px solid oklch(0.22 0.01 255);
+}
+
+.calendar-container .rbc-time-content {
+  border-top: 2px solid oklch(0.22 0.01 255);
+}
+
+.calendar-container .rbc-current-time-indicator {
+  background-color: oklch(0.61 0.23 250);
+  height: 2px;
+}
+
+.calendar-container .rbc-slot-selection {
+  background-color: oklch(0.61 0.23 250 / 0.3);
+}
+
+.calendar-container .rbc-toolbar {
+  display: none; /* We use custom toolbar */
+}
+
+.calendar-container .rbc-day-slot .rbc-time-slot {
+  color: oklch(0.55 0.01 255);
+}
+
+.calendar-container .rbc-label {
+  color: oklch(0.55 0.01 255);
+  font-size: 12px;
+}
+
+.calendar-container .rbc-time-header-gutter {
+  background: oklch(0.16 0.01 255);
+  border-right: 1px solid oklch(0.22 0.01 255);
+}
+
+.calendar-container .rbc-allday-cell {
+  background: oklch(0.16 0.01 255);
+}
+
+/* Make calendar events more visible */
+.calendar-container .rbc-event-content {
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { ArrowLeft, Plus, Music, Calendar, Users } from 'lucide-react'
+import { ArrowLeft, Plus, Music, Calendar, Users, Clock } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 
 export default async function ProjectDetailPage({
@@ -25,6 +25,13 @@ export default async function ProjectDetailPage({
     .single()
 
   if (!project) notFound()
+
+  // Get sessions for this project
+  const { data: sessions } = await supabase
+    .from('sessions')
+    .select('*')
+    .eq('project_id', id)
+    .order('start_time', { ascending: false })
 
   const projectStatusColors = {
     planning: 'bg-blue-500/10 text-blue-500',
@@ -163,6 +170,65 @@ export default async function ProjectDetailPage({
           )}
         </Card>
       </div>
+
+      {/* Sessions */}
+      <Card className="p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold">Sessions</h2>
+          <Link href={`/sessions/new?project=${id}`}>
+            <Button size="sm">
+              <Plus className="mr-2 h-3 w-3" />
+              New Session
+            </Button>
+          </Link>
+        </div>
+
+        {!sessions || sessions.length === 0 ? (
+          <div className="text-center py-8">
+            <Calendar className="mx-auto h-8 w-8 text-muted-foreground" />
+            <p className="mt-2 text-sm text-muted-foreground">
+              No sessions yet
+            </p>
+            <Link href={`/sessions/new?project=${id}`}>
+              <Button size="sm" variant="outline" className="mt-3">
+                Create First Session
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid gap-3 md:grid-cols-2">
+            {sessions.map((session: any) => (
+              <Link key={session.id} href={`/sessions/${session.id}`}>
+                <div className="p-4 rounded-lg border border-border hover:border-primary/20 hover:bg-accent/50 transition-colors">
+                  <div className="flex items-start gap-3">
+                    <div className="h-10 w-10 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                      <Clock className="h-4 w-4 text-primary" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-medium truncate">{session.session_name}</h3>
+                      <div className="text-sm text-muted-foreground mt-1">
+                        {new Date(session.start_time).toLocaleDateString('en-GB', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric'
+                        })}
+                        {' · '}
+                        {new Date(session.start_time).toLocaleTimeString('en-GB', {
+                          hour: '2-digit',
+                          minute: '2-digit'
+                        })}
+                      </div>
+                      <div className="text-xs text-muted-foreground mt-1">
+                        {session.client_name} · {session.engineer}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </Card>
     </div>
   )
 }

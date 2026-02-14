@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
+import SessionCalendar from '@/components/calendar/SessionCalendar'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
@@ -218,6 +219,9 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Session Calendar */}
+      <SessionCalendar />
     </div>
   )
 }

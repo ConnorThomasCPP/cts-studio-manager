@@ -20,6 +20,7 @@ import { Card } from '@/components/ui/card'
 import { ArrowLeft, Loader2, Upload, X, Music } from 'lucide-react'
 import { toast } from 'sonner'
 import Link from 'next/link'
+import type { TrackStatus } from '@/types/enhanced'
 
 interface StemFile {
   file: File
@@ -55,7 +56,9 @@ export default function NewTrackPage() {
     name: '',
     description: '',
     bpm: '',
-    key: ''
+    key: '',
+    track_no: '',
+    status: 'tracking' as TrackStatus
   })
 
   useEffect(() => {
@@ -127,7 +130,9 @@ export default function NewTrackPage() {
         name: formData.name,
         description: formData.description || null,
         bpm: formData.bpm ? parseFloat(formData.bpm) : null,
-        key: formData.key || null
+        key: formData.key || null,
+        track_no: formData.track_no ? parseInt(formData.track_no) : null,
+        status: formData.status
       })
 
       toast.success('Track created! Uploading stems...')
@@ -225,17 +230,38 @@ export default function NewTrackPage() {
               )}
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="name">
+                Track Name <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+              />
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-3">
               <div className="space-y-2">
-                <Label htmlFor="name">
-                  Track Name <span className="text-destructive">*</span>
-                </Label>
+                <Label htmlFor="track_no">Track Number</Label>
                 <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="Track Title"
-                  required
+                  id="track_no"
+                  type="number"
+                  min="1"
+                  value={formData.track_no}
+                  onChange={(e) => setFormData({ ...formData, track_no: e.target.value })}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="bpm">BPM</Label>
+                <Input
+                  id="bpm"
+                  type="number"
+                  step="0.01"
+                  value={formData.bpm}
+                  onChange={(e) => setFormData({ ...formData, bpm: e.target.value })}
                 />
               </div>
 
@@ -245,21 +271,28 @@ export default function NewTrackPage() {
                   id="key"
                   value={formData.key}
                   onChange={(e) => setFormData({ ...formData, key: e.target.value })}
-                  placeholder="C Major"
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="bpm">BPM</Label>
-              <Input
-                id="bpm"
-                type="number"
-                step="0.01"
-                value={formData.bpm}
-                onChange={(e) => setFormData({ ...formData, bpm: e.target.value })}
-                placeholder="120"
-              />
+              <Label htmlFor="status">Status</Label>
+              <Select
+                value={formData.status}
+                onValueChange={(value: TrackStatus) => setFormData({ ...formData, status: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="writing">Writing</SelectItem>
+                  <SelectItem value="tracking">Tracking</SelectItem>
+                  <SelectItem value="editing">Editing</SelectItem>
+                  <SelectItem value="mixing">Mixing</SelectItem>
+                  <SelectItem value="mastering">Mastering</SelectItem>
+                  <SelectItem value="delivered">Delivered</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             <div className="space-y-2">
@@ -268,7 +301,6 @@ export default function NewTrackPage() {
                 id="description"
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                placeholder="Track notes..."
                 rows={3}
               />
             </div>
@@ -313,7 +345,6 @@ export default function NewTrackPage() {
                     <Input
                       value={stem.name}
                       onChange={(e) => updateStem(index, 'name', e.target.value)}
-                      placeholder="Stem name"
                       className="flex-1"
                     />
 

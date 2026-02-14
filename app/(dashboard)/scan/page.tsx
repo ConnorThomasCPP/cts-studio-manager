@@ -237,8 +237,10 @@ export default function ScanPage() {
     }
   }
 
-  // Cleanup on unmount
+  // Auto-start scanner on mount and cleanup on unmount
   useEffect(() => {
+    startScanner()
+
     return () => {
       stopScanner()
     }
@@ -267,12 +269,7 @@ export default function ScanPage() {
         <Card className="p-6 mb-6">
           <div id="reader" className="w-full mb-4" />
 
-          {!isScanning ? (
-            <Button onClick={startScanner} className="w-full" size="lg">
-              <Camera className="mr-2 h-5 w-5" />
-              Start Scanner
-            </Button>
-          ) : (
+          {isScanning && (
             <Button
               onClick={stopScanner}
               variant="destructive"

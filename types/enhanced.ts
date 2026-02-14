@@ -135,6 +135,67 @@ export type StemCommentInsert = Database['public']['Tables']['stem_comments']['I
 export type StemCommentUpdate = Database['public']['Tables']['stem_comments']['Update']
 
 // =============================================================================
+// CALENDAR INTEGRATION TYPES
+// =============================================================================
+
+// Calendar provider enum (matches database CHECK constraint)
+export type CalendarProvider = 'google' | 'microsoft' | 'apple'
+
+// Sync direction enum (matches database CHECK constraint)
+export type SyncDirection = 'session_to_calendar' | 'calendar_to_session' | 'bidirectional'
+
+// Sync status enum (matches database CHECK constraint)
+export type SyncStatus = 'synced' | 'pending' | 'error' | 'conflict'
+
+// Calendar Connection types
+export type CalendarConnection = Omit<
+  Database['public']['Tables']['calendar_connections']['Row'],
+  'provider' | 'sync_direction'
+> & {
+  provider: CalendarProvider
+  sync_direction: SyncDirection
+}
+export type CalendarConnectionInsert = Omit<
+  Database['public']['Tables']['calendar_connections']['Insert'],
+  'provider' | 'sync_direction'
+> & {
+  provider: CalendarProvider
+  sync_direction?: SyncDirection
+}
+export type CalendarConnectionUpdate = Omit<
+  Database['public']['Tables']['calendar_connections']['Update'],
+  'provider' | 'sync_direction'
+> & {
+  provider?: CalendarProvider
+  sync_direction?: SyncDirection
+}
+
+// Calendar Sync types
+export type CalendarSync = Omit<
+  Database['public']['Tables']['calendar_syncs']['Row'],
+  'sync_status'
+> & {
+  sync_status: SyncStatus
+}
+export type CalendarSyncInsert = Omit<
+  Database['public']['Tables']['calendar_syncs']['Insert'],
+  'sync_status'
+> & {
+  sync_status?: SyncStatus
+}
+export type CalendarSyncUpdate = Omit<
+  Database['public']['Tables']['calendar_syncs']['Update'],
+  'sync_status'
+> & {
+  sync_status?: SyncStatus
+}
+
+// Session Attendee types
+export type SessionAttendee = Database['public']['Tables']['session_attendees']['Row']
+export type SessionAttendeeInsert = Database['public']['Tables']['session_attendees']['Insert']
+export type SessionAttendeeUpdate = Database['public']['Tables']['session_attendees']['Update']
+
+// =============================================================================
 // WAVEFORM DATA TYPE
 // =============================================================================
 
