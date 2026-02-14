@@ -8,16 +8,23 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Download, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { Stem, WaveformData } from '@/types/enhanced'
+import type { Stem, WaveformData, StemComment } from '@/types/enhanced'
 import WaveformCanvas from './WaveformCanvas'
 import StemHeader from './StemHeader'
 
 interface StemTrackRowProps {
   stem: Stem
   trackId: string
+  comments?: StemComment[]
+  onCommentClick?: (timestamp: number) => void
 }
 
-export default function StemTrackRow({ stem, trackId }: StemTrackRowProps) {
+export default function StemTrackRow({
+  stem,
+  trackId,
+  comments = [],
+  onCommentClick
+}: StemTrackRowProps) {
   const router = useRouter()
   const [downloading, setDownloading] = useState(false)
   const [showVolume, setShowVolume] = useState(false)
@@ -129,6 +136,9 @@ export default function StemTrackRow({ stem, trackId }: StemTrackRowProps) {
             duration={stem.duration}
             color={stem.color || '#999999'}
             stemId={stem.id}
+            comments={comments}
+            onCommentClick={onCommentClick}
+            stemName={stem.name}
           />
         )}
 

@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue
 } from '@/components/ui/select'
-import { Play, Pause, SkipBack, SkipForward, Repeat, Loader2 } from 'lucide-react'
+import { Play, Pause, SkipBack, SkipForward, Repeat, Loader2, MessageSquare, PanelRightOpen } from 'lucide-react'
 
 interface TransportControlsProps {
   isLoading?: boolean
@@ -22,11 +22,15 @@ export default function TransportControls({ isLoading }: TransportControlsProps)
     duration,
     playbackSpeed,
     isLooping,
+    isCommentMode,
+    commentSidebarOpen,
     play,
     pause,
     seek,
     setPlaybackSpeed,
-    toggleLoop
+    toggleLoop,
+    toggleCommentMode,
+    toggleCommentSidebar
   } = usePlayerStore()
 
   const formatTime = (seconds: number) => {
@@ -87,6 +91,28 @@ export default function TransportControls({ isLoading }: TransportControlsProps)
           disabled={isLoading}
         >
           <Repeat className="h-4 w-4" />
+        </Button>
+
+        <div className="h-6 w-px bg-border mx-1" />
+
+        <Button
+          variant={isCommentMode ? 'default' : 'ghost'}
+          size="icon"
+          onClick={toggleCommentMode}
+          disabled={isLoading}
+          title={isCommentMode ? 'Exit comment mode' : 'Enter comment mode'}
+        >
+          <MessageSquare className="h-4 w-4" />
+        </Button>
+
+        <Button
+          variant={commentSidebarOpen ? 'default' : 'ghost'}
+          size="icon"
+          onClick={toggleCommentSidebar}
+          disabled={isLoading}
+          title={commentSidebarOpen ? 'Hide comments' : 'Show comments'}
+        >
+          <PanelRightOpen className="h-4 w-4" />
         </Button>
       </div>
 

@@ -1,18 +1,33 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePlayerStore } from '@/lib/stores/player-store'
+import type { StemComment } from '@/types/enhanced'
+import CommentMarker from './CommentMarker'
 
 interface WaveformCanvasProps {
   peaks: number[]
   duration: number
   color: string
   stemId: string
+  comments?: StemComment[]
+  onCommentClick?: (timestamp: number) => void
+  stemName?: string
 }
 
-export default function WaveformCanvas({ peaks, duration, color, stemId }: WaveformCanvasProps) {
+export default function WaveformCanvas({
+  peaks,
+  duration,
+  color,
+  stemId,
+  comments = [],
+  onCommentClick,
+  stemName = ''
+}: WaveformCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const { currentTime, seek } = usePlayerStore()
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [hoveredComment, setHoveredComment] = useState<StemComment | null>(null)
+  const { currentTime, seek, isCommentMode } = usePlayerStore()
 
   // Draw waveform
   useEffect(() => {
@@ -62,7 +77,7 @@ export default function WaveformCanvas({ peaks, duration, color, stemId }: Wavef
     ctx.stroke()
   }, [peaks, duration, currentTime, color])
 
-  // Handle click to seek
+  // Handle click to seek or add comment
   const handleClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current
     if (!canvas) return
@@ -72,15 +87,38 @@ export default function WaveformCanvas({ peaks, duration, color, stemId }: Wavef
     const percent = x / rect.width
     const newTime = percent * duration
 
-    seek(newTime)
+    if (isCommentMode && onCommentClick) {
+      // In comment mode, trigger comment modal
+      onCommentClick(newTime)
+    } else {
+      // Normal mode, seek to position
+      seek(newTime)
+    }
   }
 
   return (
-    <canvas
-      ref={canvasRef}
-      onClick={handleClick}
-      className="w-full h-16 cursor-pointer rounded hover:opacity-90 transition-opacity"
-      style={{ display: 'block' }}
-    />
+    <div ref={containerRef} className="relative w-full h-16">
+      <canvas
+        ref={canvasRef}
+        onClick={handleClick}
+        className={`w-full h-16 rounded hover:opacity-90 transition-opacity ${
+          isCommentMode ? 'cursor-crosshair' : 'cursor-pointer'
+        }`}
+        style={{ display: 'block' }}
+      />
+
+      {/* Comment markers */}
+      {comments.map((comment) => (
+        <CommentMarker
+          key={comment.id}
+          comment={comment}
+          duration={duration}
+          canvasWidth={containerRef.current?.clientWidth || 0}
+          color={color}
+          onHover={setHoveredComment}
+          onClick={() => seek(comment.timestamp)}
+        />
+      ))}
+    </div>
   )
 }

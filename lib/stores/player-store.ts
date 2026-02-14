@@ -18,6 +18,10 @@ interface PlayerState {
   isLooping: boolean
   loopRegion: { start: number; end: number } | null
 
+  // Comment mode
+  isCommentMode: boolean
+  commentSidebarOpen: boolean
+
   // Actions - Playback
   play: () => void
   pause: () => void
@@ -38,6 +42,12 @@ interface PlayerState {
   toggleLoop: () => void
   setLoopRegion: (start: number | null, end: number | null) => void
 
+  // Actions - Comment mode
+  toggleCommentMode: () => void
+  setCommentMode: (enabled: boolean) => void
+  toggleCommentSidebar: () => void
+  setCommentSidebar: (open: boolean) => void
+
   // Actions - Reset
   resetPlayer: () => void
 }
@@ -53,6 +63,8 @@ const initialState = {
   playbackSpeed: 1,
   isLooping: false,
   loopRegion: null,
+  isCommentMode: false,
+  commentSidebarOpen: false,
 }
 
 export const usePlayerStore = create<PlayerState>()(
@@ -185,6 +197,18 @@ export const usePlayerStore = create<PlayerState>()(
           set({ loopRegion: { start, end } })
         }
       },
+
+      // ============================================================================
+      // COMMENT MODE
+      // ============================================================================
+
+      toggleCommentMode: () => set((state) => ({ isCommentMode: !state.isCommentMode })),
+
+      setCommentMode: (enabled) => set({ isCommentMode: enabled }),
+
+      toggleCommentSidebar: () => set((state) => ({ commentSidebarOpen: !state.commentSidebarOpen })),
+
+      setCommentSidebar: (open) => set({ commentSidebarOpen: open }),
 
       // ============================================================================
       // RESET

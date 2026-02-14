@@ -3,9 +3,13 @@
 import { useEffect, useRef, useState } from 'react'
 import { Howl } from 'howler'
 import { usePlayerStore } from '@/lib/stores/player-store'
+import { stemService } from '@/lib/services/stem-service'
+import { toast } from 'sonner'
 import TransportControls from './TransportControls'
 import StemTrackRow from './StemTrackRow'
-import type { Stem } from '@/types/enhanced'
+import CommentModal from './CommentModal'
+import CommentSidebar from './CommentSidebar'
+import type { Stem, StemComment } from '@/types/enhanced'
 
 interface StemPlayerProps {
   trackId: string
@@ -16,6 +20,14 @@ export default function StemPlayer({ trackId, stems }: StemPlayerProps) {
   const howlers = useRef<Map<string, Howl>>(new Map())
   const [isLoading, setIsLoading] = useState(true)
   const animationFrameRef = useRef<number | undefined>(undefined)
+  const [comments, setComments] = useState<StemComment[]>([])
+  const [commentModalOpen, setCommentModalOpen] = useState(false)
+  const [commentModalData, setCommentModalData] = useState<{
+    stemId: string
+    stemName: string
+    timestamp: number
+  } | null>(null)
+  const [currentUserId, setCurrentUserId] = useState<string>()
 
   const {
     isPlaying,
@@ -24,12 +36,42 @@ export default function StemPlayer({ trackId, stems }: StemPlayerProps) {
     mutedStems,
     stemVolumes,
     playbackSpeed,
+    commentSidebarOpen,
+    seek,
     setDuration,
     setCurrentTime,
     play,
     pause,
     resetPlayer
   } = usePlayerStore()
+
+  // Fetch comments for all stems
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const allComments: StemComment[] = []
+        for (const stem of stems) {
+          const stemComments = await stemService.getComments(stem.id)
+          allComments.push(...stemComments)
+        }
+        setComments(allComments)
+      } catch (error) {
+        console.error('Failed to fetch comments:', error)
+      }
+    }
+
+    const fetchUser = async () => {
+      try {
+        const user = await stemService.getCurrentUser()
+        setCurrentUserId(user?.id)
+      } catch (error) {
+        console.error('Failed to fetch user:', error)
+      }
+    }
+
+    fetchComments()
+    fetchUser()
+  }, [stems])
 
   // Initialize Howler instances for each stem
   useEffect(() => {
@@ -172,6 +214,40 @@ export default function StemPlayer({ trackId, stems }: StemPlayerProps) {
     return () => clearInterval(syncInterval)
   }, [isPlaying])
 
+  // Comment handlers
+  const handleCommentClick = (stemId: string, stemName: string, timestamp: number) => {
+    setCommentModalData({ stemId, stemName, timestamp })
+    setCommentModalOpen(true)
+  }
+
+  const handleCommentSave = async (content: string) => {
+    if (!commentModalData) return
+
+    try {
+      const newComment = await stemService.createComment({
+        stem_id: commentModalData.stemId,
+        timestamp: commentModalData.timestamp,
+        content
+      })
+      setComments((prev) => [...prev, newComment])
+      toast.success('Comment added')
+    } catch (error) {
+      console.error('Failed to create comment:', error)
+      toast.error('Failed to add comment')
+    }
+  }
+
+  const handleCommentDelete = async (commentId: string) => {
+    try {
+      await stemService.deleteComment(commentId)
+      setComments((prev) => prev.filter((c) => c.id !== commentId))
+      toast.success('Comment deleted')
+    } catch (error) {
+      console.error('Failed to delete comment:', error)
+      toast.error('Failed to delete comment')
+    }
+  }
+
   if (!stems || stems.length === 0) {
     return (
       <div className="flex-1 flex items-center justify-center">
@@ -186,16 +262,49 @@ export default function StemPlayer({ trackId, stems }: StemPlayerProps) {
   }
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className="flex-1 flex flex-col overflow-hidden relative">
       {/* Transport controls */}
       <TransportControls isLoading={isLoading} />
 
       {/* Stem list */}
       <div className="flex-1 overflow-y-auto bg-surface-0">
         {stems.map((stem) => (
-          <StemTrackRow key={stem.id} stem={stem} trackId={trackId} />
+          <StemTrackRow
+            key={stem.id}
+            stem={stem}
+            trackId={trackId}
+            comments={comments.filter((c) => c.stem_id === stem.id)}
+            onCommentClick={(timestamp) =>
+              handleCommentClick(stem.id, stem.name, timestamp)
+            }
+          />
         ))}
       </div>
+
+      {/* Comment modal */}
+      {commentModalData && (
+        <CommentModal
+          isOpen={commentModalOpen}
+          onClose={() => {
+            setCommentModalOpen(false)
+            setCommentModalData(null)
+          }}
+          onSave={handleCommentSave}
+          timestamp={commentModalData.timestamp}
+          stemName={commentModalData.stemName}
+        />
+      )}
+
+      {/* Comment sidebar */}
+      <CommentSidebar
+        isOpen={commentSidebarOpen}
+        onClose={() => usePlayerStore.getState().setCommentSidebar(false)}
+        comments={comments}
+        stems={stems}
+        onSeek={seek}
+        onDelete={handleCommentDelete}
+        currentUserId={currentUserId}
+      />
     </div>
   )
 }

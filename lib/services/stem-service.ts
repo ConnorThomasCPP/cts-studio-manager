@@ -361,7 +361,9 @@ export class StemService {
   /**
    * Create a comment on a stem
    */
-  async createComment(comment: StemCommentInsert): Promise<StemComment> {
+  async createComment(
+    comment: Omit<StemCommentInsert, 'user_id'>
+  ): Promise<StemComment> {
     const { data: { user } } = await this.supabase.auth.getUser()
     if (!user) throw new Error('Not authenticated')
 
@@ -403,6 +405,28 @@ export class StemService {
       .eq('id', id)
 
     if (error) throw error
+  }
+
+  /**
+   * Get comments for a specific stem
+   */
+  async getComments(stemId: string): Promise<StemComment[]> {
+    const { data, error } = await this.supabase
+      .from('stem_comments')
+      .select('*')
+      .eq('stem_id', stemId)
+      .order('timestamp', { ascending: true })
+
+    if (error) throw error
+    return data || []
+  }
+
+  /**
+   * Get current user
+   */
+  async getCurrentUser() {
+    const { data: { user } } = await this.supabase.auth.getUser()
+    return user
   }
 
   /**
