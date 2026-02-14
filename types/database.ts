@@ -252,6 +252,199 @@ export interface Database {
           metadata?: Json | null
         }
       }
+      clients: {
+        Row: {
+          id: string
+          name: string
+          email: string | null
+          phone: string | null
+          company: string | null
+          notes: string | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          name: string
+          email?: string | null
+          phone?: string | null
+          company?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          name?: string
+          email?: string | null
+          phone?: string | null
+          company?: string | null
+          notes?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+      }
+      projects: {
+        Row: {
+          id: string
+          client_id: string
+          name: string
+          description: string | null
+          status: 'planning' | 'active' | 'review' | 'completed' | 'archived'
+          deadline: string | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          client_id: string
+          name: string
+          description?: string | null
+          status?: 'planning' | 'active' | 'review' | 'completed' | 'archived'
+          deadline?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          client_id?: string
+          name?: string
+          description?: string | null
+          status?: 'planning' | 'active' | 'review' | 'completed' | 'archived'
+          deadline?: string | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+      }
+      tracks: {
+        Row: {
+          id: string
+          project_id: string
+          name: string
+          description: string | null
+          bpm: number | null
+          key: string | null
+          duration: number | null
+          waveform_data: Json | null
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          project_id: string
+          name: string
+          description?: string | null
+          bpm?: number | null
+          key?: string | null
+          duration?: number | null
+          waveform_data?: Json | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          project_id?: string
+          name?: string
+          description?: string | null
+          bpm?: number | null
+          key?: string | null
+          duration?: number | null
+          waveform_data?: Json | null
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+      }
+      stems: {
+        Row: {
+          id: string
+          track_id: string
+          name: string
+          type: 'vocals' | 'drums' | 'bass' | 'guitar' | 'keys' | 'synth' | 'fx' | 'other' | null
+          color: string
+          icon: string
+          file_path: string
+          file_size: number | null
+          mime_type: string | null
+          duration: number | null
+          waveform_data: Json | null
+          sort_order: number
+          download_count: number
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }
+        Insert: {
+          id?: string
+          track_id: string
+          name: string
+          type?: 'vocals' | 'drums' | 'bass' | 'guitar' | 'keys' | 'synth' | 'fx' | 'other' | null
+          color?: string
+          icon?: string
+          file_path: string
+          file_size?: number | null
+          mime_type?: string | null
+          duration?: number | null
+          waveform_data?: Json | null
+          sort_order?: number
+          download_count?: number
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+        Update: {
+          id?: string
+          track_id?: string
+          name?: string
+          type?: 'vocals' | 'drums' | 'bass' | 'guitar' | 'keys' | 'synth' | 'fx' | 'other' | null
+          color?: string
+          icon?: string
+          file_path?: string
+          file_size?: number | null
+          mime_type?: string | null
+          duration?: number | null
+          waveform_data?: Json | null
+          sort_order?: number
+          download_count?: number
+          created_at?: string
+          updated_at?: string
+          created_by?: string | null
+        }
+      }
+      stem_comments: {
+        Row: {
+          id: string
+          stem_id: string
+          user_id: string
+          timestamp: number
+          content: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          stem_id: string
+          user_id: string
+          timestamp: number
+          content: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          stem_id?: string
+          user_id?: string
+          timestamp?: number
+          content?: string
+          created_at?: string
+        }
+      }
     }
     Views: {
       [_ in never]: never
@@ -288,6 +481,35 @@ export interface Database {
           p_category_name?: string
         }
         Returns: string
+      }
+      get_track_stems_with_comments: {
+        Args: {
+          track_uuid: string
+        }
+        Returns: Array<{
+          id: string
+          track_id: string
+          name: string
+          type: string | null
+          color: string
+          file_path: string
+          file_size: number | null
+          mime_type: string | null
+          duration: number | null
+          waveform_data: Json | null
+          sort_order: number
+          download_count: number
+          comment_count: number
+          created_at: string
+          updated_at: string
+          created_by: string | null
+        }>
+      }
+      increment_stem_download: {
+        Args: {
+          stem_uuid: string
+        }
+        Returns: void
       }
     }
     Enums: {

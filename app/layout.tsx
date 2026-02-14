@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CTs Studio Manager",
-  description: "Track studio equipment and sessions with barcode-based check-in/check-out",
+  title: "Studio Manager",
+  description: "Professional studio management platform for tracking equipment, sessions, and projects",
 };
 
 export default function RootLayout({
