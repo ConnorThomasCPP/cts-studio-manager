@@ -122,7 +122,7 @@ export default async function ClientDetailPage({
             </div>
           ) : (
             <div className="space-y-3">
-              {client.projects.map((project: any) => (
+              {client.projects.map((project) => (
                 <Link key={project.id} href={`/projects/${project.id}`}>
                   <div className="p-4 rounded-lg border border-border hover:border-primary/20 hover:bg-accent/50 transition-colors">
                     <div className="flex items-start justify-between">

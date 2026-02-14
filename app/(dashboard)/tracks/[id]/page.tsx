@@ -1,6 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import StemPlayer from './components/StemPlayer'
+import type { Database } from '@/types/database'
+
+type Stem = Database['public']['Tables']['stems']['Row']
 
 export default async function TrackPlayerPage({
   params
@@ -30,7 +33,7 @@ export default async function TrackPlayerPage({
   }
 
   // Sort stems by sort_order
-  const sortedStems = track.stems?.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)) || []
+  const sortedStems = (track.stems?.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)) || []) as Stem[]
 
   return (
     <div className="h-screen flex flex-col bg-background">

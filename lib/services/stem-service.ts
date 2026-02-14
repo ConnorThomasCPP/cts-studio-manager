@@ -173,7 +173,7 @@ export class StemService {
       .single()
 
     if (error) throw error
-    return data
+    return data as Stem
   }
 
   /**
@@ -251,7 +251,7 @@ export class StemService {
       .single()
 
     if (error) throw error
-    return data
+    return data as Stem
   }
 
   /**
@@ -359,7 +359,7 @@ export class StemService {
   /**
    * Create a comment on a stem
    */
-  async createComment(comment: StemCommentInsert) {
+  async createComment(comment: StemCommentInsert): Promise<StemComment> {
     const { data: { user } } = await this.supabase.auth.getUser()
     if (!user) throw new Error('Not authenticated')
 
@@ -373,13 +373,13 @@ export class StemService {
       .single()
 
     if (error) throw error
-    return data
+    return data as StemComment
   }
 
   /**
    * Update a comment
    */
-  async updateComment(id: string, content: string) {
+  async updateComment(id: string, content: string): Promise<StemComment> {
     const { data, error } = await this.supabase
       .from('stem_comments')
       .update({ content })
@@ -388,7 +388,7 @@ export class StemService {
       .single()
 
     if (error) throw error
-    return data
+    return data as StemComment
   }
 
   /**

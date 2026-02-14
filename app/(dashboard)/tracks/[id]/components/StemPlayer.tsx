@@ -17,7 +17,7 @@ interface StemPlayerProps {
 export default function StemPlayer({ trackId, stems }: StemPlayerProps) {
   const howlers = useRef<Map<string, Howl>>(new Map())
   const [isLoading, setIsLoading] = useState(true)
-  const animationFrameRef = useRef<number>()
+  const animationFrameRef = useRef<number | undefined>(undefined)
 
   const {
     isPlaying,

@@ -78,7 +78,7 @@ export default function StemHeader({ stem, onUpdate }: StemHeaderProps) {
   const [editedName, setEditedName] = useState(stem.name)
   const [saving, setSaving] = useState(false)
 
-  const Icon = iconMap[stem.icon] || Music
+  const Icon = stem.icon ? iconMap[stem.icon] || Music : Music
 
   const handleSaveName = async () => {
     if (!editedName.trim()) {

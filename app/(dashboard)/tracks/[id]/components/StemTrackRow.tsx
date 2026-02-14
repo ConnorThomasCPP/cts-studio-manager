@@ -74,7 +74,7 @@ export default function StemTrackRow({ stem, trackId }: StemTrackRowProps) {
     }
   }
 
-  const waveformPeaks = stem.waveform_data?.peaks || []
+  const waveformPeaks = (stem.waveform_data as { peaks?: number[] } | null)?.peaks || []
 
   const handleUpdate = () => {
     router.refresh()
