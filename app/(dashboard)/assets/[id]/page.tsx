@@ -129,6 +129,13 @@ export default async function AssetDetailPage({
                 <div className="font-medium font-mono">{asset.serial_number}</div>
               </div>
             )}
+
+            {asset.replacement_cost && (
+              <div>
+                <div className="text-sm text-muted-foreground">Replacement Cost</div>
+                <div className="font-medium">£{asset.replacement_cost.toFixed(2)}</div>
+              </div>
+            )}
           </CardContent>
         </Card>
 
