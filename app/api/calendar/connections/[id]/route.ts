@@ -11,9 +11,10 @@ import { CalendarService } from '@/lib/services/calendar-service'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -23,7 +24,7 @@ export async function PUT(
 
     const calendarService = new CalendarService(supabase)
     const body = await request.json()
-    const connection = await calendarService.updateConnection(params.id, body)
+    const connection = await calendarService.updateConnection(id, body)
     return NextResponse.json(connection)
   } catch (error: any) {
     console.error('Failed to update connection:', error)
@@ -36,9 +37,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -47,7 +49,7 @@ export async function DELETE(
     }
 
     const calendarService = new CalendarService(supabase)
-    await calendarService.deleteConnection(params.id)
+    await calendarService.deleteConnection(id)
     return NextResponse.json({ success: true })
   } catch (error: any) {
     console.error('Failed to delete connection:', error)
