@@ -129,36 +129,48 @@ export type Database = {
       }
       clients: {
         Row: {
+          billing_address: string | null
+          billing_email: string | null
           company: string | null
           created_at: string | null
           created_by: string | null
+          default_hourly_rate: number | null
           email: string | null
           id: string
           name: string
           notes: string | null
           phone: string | null
+          type: string | null
           updated_at: string | null
         }
         Insert: {
+          billing_address?: string | null
+          billing_email?: string | null
           company?: string | null
           created_at?: string | null
           created_by?: string | null
+          default_hourly_rate?: number | null
           email?: string | null
           id?: string
           name: string
           notes?: string | null
           phone?: string | null
+          type?: string | null
           updated_at?: string | null
         }
         Update: {
+          billing_address?: string | null
+          billing_email?: string | null
           company?: string | null
           created_at?: string | null
           created_by?: string | null
+          default_hourly_rate?: number | null
           email?: string | null
           id?: string
           name?: string
           notes?: string | null
           phone?: string | null
+          type?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -199,9 +211,15 @@ export type Database = {
           created_by: string | null
           deadline: string | null
           description: string | null
+          end_date: string | null
           id: string
           name: string
+          notes: string | null
+          project_type: string | null
+          rate_model: string | null
+          start_date: string | null
           status: string
+          storage_policy: string | null
           updated_at: string | null
         }
         Insert: {
@@ -210,9 +228,15 @@ export type Database = {
           created_by?: string | null
           deadline?: string | null
           description?: string | null
+          end_date?: string | null
           id?: string
           name: string
+          notes?: string | null
+          project_type?: string | null
+          rate_model?: string | null
+          start_date?: string | null
           status?: string
+          storage_policy?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -221,9 +245,15 @@ export type Database = {
           created_by?: string | null
           deadline?: string | null
           description?: string | null
+          end_date?: string | null
           id?: string
           name?: string
+          notes?: string | null
+          project_type?: string | null
+          rate_model?: string | null
+          start_date?: string | null
           status?: string
+          storage_policy?: string | null
           updated_at?: string | null
         }
         Relationships: [
@@ -300,6 +330,7 @@ export type Database = {
           engineer: string
           id: string
           notes: string | null
+          project_id: string | null
           session_name: string
           start_time: string
           status: string
@@ -313,6 +344,7 @@ export type Database = {
           engineer: string
           id?: string
           notes?: string | null
+          project_id?: string | null
           session_name: string
           start_time: string
           status?: string
@@ -326,6 +358,7 @@ export type Database = {
           engineer?: string
           id?: string
           notes?: string | null
+          project_id?: string | null
           session_name?: string
           start_time?: string
           status?: string
@@ -337,6 +370,20 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "active_projects_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sessions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -498,6 +545,8 @@ export type Database = {
           key: string | null
           name: string
           project_id: string
+          status: string | null
+          track_no: number | null
           updated_at: string | null
           waveform_data: Json | null
         }
@@ -511,6 +560,8 @@ export type Database = {
           key?: string | null
           name: string
           project_id: string
+          status?: string | null
+          track_no?: number | null
           updated_at?: string | null
           waveform_data?: Json | null
         }
@@ -524,6 +575,8 @@ export type Database = {
           key?: string | null
           name?: string
           project_id?: string
+          status?: string | null
+          track_no?: number | null
           updated_at?: string | null
           waveform_data?: Json | null
         }
@@ -533,6 +586,13 @@ export type Database = {
             columns: ["created_by"]
             isOneToOne: false
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tracks_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "active_projects_summary"
             referencedColumns: ["id"]
           },
           {
@@ -663,7 +723,20 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      active_projects_summary: {
+        Row: {
+          client_name: string | null
+          end_date: string | null
+          id: string | null
+          name: string | null
+          project_type: string | null
+          session_count: number | null
+          start_date: string | null
+          status: string | null
+          track_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       can_complete_session: { Args: { p_session_id: string }; Returns: Json }

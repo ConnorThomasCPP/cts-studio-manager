@@ -53,33 +53,71 @@ export type TransactionUpdate = Database['public']['Tables']['transactions']['Up
 export type SettingUpdate = Database['public']['Tables']['settings']['Update']
 
 // =============================================================================
-// ENHANCED STEM PLAYER TYPES (with stricter union types)
+// ENHANCED STUDIO WORKFLOW TYPES (with stricter union types)
 // =============================================================================
 
 // Stem type enum (matches database CHECK constraint)
 export type StemType = 'vocals' | 'drums' | 'bass' | 'guitar' | 'keys' | 'synth' | 'fx' | 'other'
 
+// Client type enum (matches database CHECK constraint)
+export type ClientType = 'artist' | 'band' | 'label' | 'producer' | 'other'
+
 // Project status enum (matches database CHECK constraint)
-export type ProjectStatus = 'planning' | 'active' | 'review' | 'completed' | 'archived'
+export type ProjectStatus = 'draft' | 'active' | 'on_hold' | 'delivered' | 'archived'
 
-// Base types from auto-generated
-export type Client = Database['public']['Tables']['clients']['Row']
-export type ClientInsert = Database['public']['Tables']['clients']['Insert']
-export type ClientUpdate = Database['public']['Tables']['clients']['Update']
+// Project type enum (matches database CHECK constraint)
+export type ProjectType = 'recording' | 'mixing' | 'mastering' | 'podcast' | 'film' | 'other'
 
-export type Project = Omit<Database['public']['Tables']['projects']['Row'], 'status'> & {
+// Storage policy enum (matches database CHECK constraint)
+export type StoragePolicy = 'retain_30' | 'retain_90' | 'metadata_only'
+
+// Rate model enum (matches database CHECK constraint)
+export type RateModel = 'per_day' | 'per_track' | 'fixed_rate'
+
+// Track status enum (matches database CHECK constraint)
+export type TrackStatus = 'writing' | 'tracking' | 'editing' | 'mixing' | 'mastering' | 'delivered'
+
+// Enhanced Client type with strict type field
+export type Client = Omit<Database['public']['Tables']['clients']['Row'], 'type'> & {
+  type: ClientType
+}
+export type ClientInsert = Omit<Database['public']['Tables']['clients']['Insert'], 'type'> & {
+  type?: ClientType
+}
+export type ClientUpdate = Omit<Database['public']['Tables']['clients']['Update'], 'type'> & {
+  type?: ClientType
+}
+
+// Enhanced Project type with strict status, project_type, storage_policy, and rate_model fields
+export type Project = Omit<Database['public']['Tables']['projects']['Row'], 'status' | 'project_type' | 'storage_policy' | 'rate_model'> & {
   status: ProjectStatus
+  project_type: ProjectType
+  storage_policy: StoragePolicy
+  rate_model: RateModel
 }
-export type ProjectInsert = Omit<Database['public']['Tables']['projects']['Insert'], 'status'> & {
+export type ProjectInsert = Omit<Database['public']['Tables']['projects']['Insert'], 'status' | 'project_type' | 'storage_policy' | 'rate_model'> & {
   status?: ProjectStatus
+  project_type?: ProjectType
+  storage_policy?: StoragePolicy
+  rate_model?: RateModel
 }
-export type ProjectUpdate = Omit<Database['public']['Tables']['projects']['Update'], 'status'> & {
+export type ProjectUpdate = Omit<Database['public']['Tables']['projects']['Update'], 'status' | 'project_type' | 'storage_policy' | 'rate_model'> & {
   status?: ProjectStatus
+  project_type?: ProjectType
+  storage_policy?: StoragePolicy
+  rate_model?: RateModel
 }
 
-export type Track = Database['public']['Tables']['tracks']['Row']
-export type TrackInsert = Database['public']['Tables']['tracks']['Insert']
-export type TrackUpdate = Database['public']['Tables']['tracks']['Update']
+// Enhanced Track type with strict status field
+export type Track = Omit<Database['public']['Tables']['tracks']['Row'], 'status'> & {
+  status: TrackStatus
+}
+export type TrackInsert = Omit<Database['public']['Tables']['tracks']['Insert'], 'status'> & {
+  status?: TrackStatus
+}
+export type TrackUpdate = Omit<Database['public']['Tables']['tracks']['Update'], 'status'> & {
+  status?: TrackStatus
+}
 
 // Enhanced Stem type with strict type field
 export type Stem = Omit<Database['public']['Tables']['stems']['Row'], 'type'> & {
