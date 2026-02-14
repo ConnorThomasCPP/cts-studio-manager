@@ -25,10 +25,8 @@ import {
   Check
 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { Database } from '@/types/database'
+import type { Stem } from '@/types/enhanced'
 import { LucideIcon } from 'lucide-react'
-
-type Stem = Database['public']['Tables']['stems']['Row']
 
 interface StemHeaderProps {
   stem: Stem
@@ -153,7 +151,7 @@ export default function StemHeader({ stem, onUpdate }: StemHeaderProps) {
             className="h-6 w-6 shrink-0 hover:bg-accent"
             disabled={saving}
           >
-            <Icon className="h-4 w-4" style={{ color: stem.color }} />
+            <Icon className="h-4 w-4" style={{ color: stem.color ?? undefined }} />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-56">
@@ -202,14 +200,14 @@ export default function StemHeader({ stem, onUpdate }: StemHeaderProps) {
           onBlur={handleSaveName}
           onKeyDown={handleKeyDown}
           className="h-6 text-sm font-medium px-2 py-0"
-          style={{ color: stem.color }}
+          style={{ color: stem.color ?? undefined }}
           autoFocus
           disabled={saving}
         />
       ) : (
         <h3
           className="font-medium truncate text-sm hover:text-primary transition-colors cursor-pointer"
-          style={{ color: stem.color }}
+          style={{ color: stem.color ?? undefined }}
           onClick={() => setIsEditing(true)}
         >
           {stem.name}

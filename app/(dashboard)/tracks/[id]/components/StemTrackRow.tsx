@@ -8,11 +8,9 @@ import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Download, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
-import type { Database } from '@/types/database'
+import type { Stem, WaveformData } from '@/types/enhanced'
 import WaveformCanvas from './WaveformCanvas'
 import StemHeader from './StemHeader'
-
-type Stem = Database['public']['Tables']['stems']['Row']
 
 interface StemTrackRowProps {
   stem: Stem
@@ -74,7 +72,7 @@ export default function StemTrackRow({ stem, trackId }: StemTrackRowProps) {
     }
   }
 
-  const waveformPeaks = (stem.waveform_data as { peaks?: number[] } | null)?.peaks || []
+  const waveformPeaks = (stem.waveform_data as WaveformData | null)?.peaks || []
 
   const handleUpdate = () => {
     router.refresh()
@@ -84,7 +82,7 @@ export default function StemTrackRow({ stem, trackId }: StemTrackRowProps) {
     <div
       className="border-b hover:bg-accent/50 transition-colors group flex"
       style={{
-        borderLeftColor: stem.color,
+        borderLeftColor: stem.color ?? undefined,
         borderLeftWidth: '4px'
       }}
     >
@@ -129,7 +127,7 @@ export default function StemTrackRow({ stem, trackId }: StemTrackRowProps) {
           <WaveformCanvas
             peaks={waveformPeaks}
             duration={stem.duration}
-            color={stem.color}
+            color={stem.color || '#999999'}
             stemId={stem.id}
           />
         )}

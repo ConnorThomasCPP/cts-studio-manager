@@ -1,11 +1,13 @@
 import { createClient } from '@/lib/supabase/client'
-import type { Database } from '@/types/database'
-
-type Stem = Database['public']['Tables']['stems']['Row']
-type StemInsert = Database['public']['Tables']['stems']['Insert']
-type StemUpdate = Database['public']['Tables']['stems']['Update']
-type StemComment = Database['public']['Tables']['stem_comments']['Row']
-type StemCommentInsert = Database['public']['Tables']['stem_comments']['Insert']
+import type {
+  Stem,
+  StemInsert,
+  StemUpdate,
+  StemComment,
+  StemCommentInsert,
+  StemType,
+  WaveformData
+} from '@/types/enhanced'
 
 export class StemService {
   private supabase = createClient()
@@ -121,7 +123,7 @@ export class StemService {
     projectId: string,
     trackId: string,
     name: string,
-    type: 'vocals' | 'drums' | 'bass' | 'guitar' | 'keys' | 'synth' | 'fx' | 'other',
+    type: StemType,
     file: File,
     color?: string
   ): Promise<Stem> {
@@ -180,7 +182,7 @@ export class StemService {
    * Get default color for stem type
    * @private
    */
-  private getDefaultColor(type: string): string {
+  private getDefaultColor(type: StemType): string {
     const colorMap: Record<string, string> = {
       vocals: '#f6bbd6',
       drums: '#348c32',
@@ -198,7 +200,7 @@ export class StemService {
    * Get default icon for stem type
    * @private
    */
-  private getDefaultIcon(type: string): string {
+  private getDefaultIcon(type: StemType): string {
     const iconMap: Record<string, string> = {
       vocals: 'mic',
       drums: 'circle',

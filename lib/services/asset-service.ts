@@ -5,11 +5,7 @@
  */
 
 import { createClient } from '@/lib/supabase/client'
-import type { Database } from '@/types/database'
-
-type Asset = Database['public']['Tables']['assets']['Row']
-type AssetInsert = Database['public']['Tables']['assets']['Insert']
-type AssetUpdate = Database['public']['Tables']['assets']['Update']
+import type { Asset, AssetInsert, AssetUpdate } from '@/types/enhanced'
 
 export class AssetService {
   private supabase = createClient()

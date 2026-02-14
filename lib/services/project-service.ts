@@ -1,9 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
-import type { Database } from '@/types/database'
-
-type Project = Database['public']['Tables']['projects']['Row']
-type ProjectInsert = Database['public']['Tables']['projects']['Insert']
-type ProjectUpdate = Database['public']['Tables']['projects']['Update']
+import type { Project, ProjectInsert, ProjectUpdate } from '@/types/enhanced'
 
 export class ProjectService {
   private supabase = createClient()

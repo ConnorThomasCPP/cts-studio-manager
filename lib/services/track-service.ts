@@ -1,9 +1,5 @@
 import { createClient } from '@/lib/supabase/client'
-import type { Database } from '@/types/database'
-
-type Track = Database['public']['Tables']['tracks']['Row']
-type TrackInsert = Database['public']['Tables']['tracks']['Insert']
-type TrackUpdate = Database['public']['Tables']['tracks']['Update']
+import type { Track, TrackInsert, TrackUpdate } from '@/types/enhanced'
 
 export class TrackService {
   private supabase = createClient()

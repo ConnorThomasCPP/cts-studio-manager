@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "gen:types": "npx supabase gen types typescript --project-id nmfqupzjhrlamyekfbqx > lib/supabase/database.types.ts && echo Database types regenerated successfully!"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",

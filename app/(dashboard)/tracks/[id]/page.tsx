@@ -1,9 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import StemPlayer from './components/StemPlayer'
-import type { Database } from '@/types/database'
-
-type Stem = Database['public']['Tables']['stems']['Row']
+import type { Stem } from '@/types/enhanced'
 
 export default async function TrackPlayerPage({
   params

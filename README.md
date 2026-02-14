@@ -150,12 +150,36 @@ ANTHROPIC_API_KEY=your_anthropic_api_key
 # Install Supabase CLI (if not already installed)
 npm install -g supabase
 
-# Login to Supabase
+# Login to Supabase (you'll need a personal access token)
 supabase login
 
-# Generate types (replace PROJECT_ID with your Supabase project ID)
-supabase gen types typescript --project-id YOUR_PROJECT_ID > lib/supabase/database.types.ts
+# Generate types using the npm script
+npm run gen:types
 ```
+
+**Important:** Set the `SUPABASE_ACCESS_TOKEN` environment variable to avoid login prompts:
+- Get your access token from: [Supabase Account Tokens](https://supabase.com/dashboard/account/tokens)
+- Add to your shell profile or `.env.local`
+
+#### Database Type Management
+
+This project uses a two-tier type system for better type safety:
+
+1. **Auto-generated base types** (`lib/supabase/database.types.ts`)
+   - Generated directly from Supabase schema
+   - Source of truth for database structure
+   - Regenerated when schema changes
+
+2. **Enhanced types** (`types/enhanced.ts`)
+   - Built on top of auto-generated types
+   - Adds stricter union types (e.g., `StemType`, `ProjectStatus`)
+   - Provides better type checking than loose `string | null` types
+
+**When to regenerate types:**
+- After running database migrations
+- After schema changes in Supabase
+- Run: `npm run gen:types`
+- Then update `types/enhanced.ts` if new fields need stricter typing
 
 ### 6. Run Development Server
 
@@ -318,8 +342,14 @@ npm run type-check
 After making database schema changes:
 
 ```bash
-supabase gen types typescript --project-id YOUR_PROJECT_ID > lib/supabase/database.types.ts
+# Easy way (uses npm script)
+npm run gen:types
+
+# Manual way (if you need to specify options)
+npx supabase gen types typescript --project-id nmfqupzjhrlamyekfbqx > lib/supabase/database.types.ts
 ```
+
+**Note:** After regenerating types, check `types/enhanced.ts` to ensure stricter types (like `StemType`, `ProjectStatus`) still match your schema.
 
 ## 📝 Common Tasks
 

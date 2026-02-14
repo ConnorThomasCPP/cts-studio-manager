@@ -5,9 +5,7 @@ import { Howl } from 'howler'
 import { usePlayerStore } from '@/lib/stores/player-store'
 import TransportControls from './TransportControls'
 import StemTrackRow from './StemTrackRow'
-import type { Database } from '@/types/database'
-
-type Stem = Database['public']['Tables']['stems']['Row']
+import type { Stem } from '@/types/enhanced'
 
 interface StemPlayerProps {
   trackId: string
