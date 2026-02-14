@@ -1,5 +1,6 @@
 'use client'
 
+import { useRef, useState, useEffect } from 'react'
 import type { StemComment } from '@/types/enhanced'
 
 interface CommentMarkerProps {
@@ -19,11 +20,24 @@ export default function CommentMarker({
   onHover,
   onClick
 }: CommentMarkerProps) {
+  const markerRef = useRef<HTMLDivElement>(null)
+  const [showBelow, setShowBelow] = useState(false)
+
   // Calculate position based on timestamp
   const position = (comment.timestamp / duration) * canvasWidth
 
+  useEffect(() => {
+    // Check if tooltip would overflow at the top
+    if (markerRef.current) {
+      const rect = markerRef.current.getBoundingClientRect()
+      // If marker is in top 120px of viewport, show tooltip below
+      setShowBelow(rect.top < 120)
+    }
+  }, [])
+
   return (
     <div
+      ref={markerRef}
       className="absolute top-0 bottom-0 cursor-pointer group"
       style={{ left: `${position}px` }}
       onMouseEnter={() => onHover(comment)}
@@ -39,8 +53,10 @@ export default function CommentMarker({
         style={{ backgroundColor: color }}
       />
 
-      {/* Hover tooltip */}
-      <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+      {/* Hover tooltip - position above or below based on screen position */}
+      <div className={`absolute left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none ${
+        showBelow ? 'top-full mt-2' : 'bottom-full mb-2'
+      }`}>
         <div className="bg-popover text-popover-foreground text-xs px-2 py-1 rounded border border-border whitespace-nowrap shadow-lg">
           {comment.content}
         </div>

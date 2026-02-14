@@ -12,6 +12,7 @@ interface CommentModalProps {
   initialContent?: string
   timestamp: number
   stemName: string
+  position?: { x: number; y: number }
 }
 
 export default function CommentModal({
@@ -20,10 +21,12 @@ export default function CommentModal({
   onSave,
   initialContent = '',
   timestamp,
-  stemName
+  stemName,
+  position
 }: CommentModalProps) {
   const [content, setContent] = useState(initialContent)
   const inputRef = useRef<HTMLInputElement>(null)
+  const modalRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setContent(initialContent)
@@ -31,6 +34,47 @@ export default function CommentModal({
       inputRef.current.focus()
     }
   }, [isOpen, initialContent])
+
+  // Calculate modal position to keep it within viewport
+  const getModalStyle = (): React.CSSProperties => {
+    if (!position) {
+      // Default centered position
+      return {}
+    }
+
+    const modalWidth = 384 // w-96 = 24rem = 384px
+    const modalHeight = 200 // Approximate height
+    const padding = 16
+
+    let left = position.x
+    let top = position.y
+
+    // Ensure modal doesn't overflow right edge
+    if (left + modalWidth > window.innerWidth - padding) {
+      left = window.innerWidth - modalWidth - padding
+    }
+
+    // Ensure modal doesn't overflow left edge
+    if (left < padding) {
+      left = padding
+    }
+
+    // Ensure modal doesn't overflow bottom edge
+    if (top + modalHeight > window.innerHeight - padding) {
+      top = window.innerHeight - modalHeight - padding
+    }
+
+    // Ensure modal doesn't overflow top edge
+    if (top < padding) {
+      top = padding
+    }
+
+    return {
+      position: 'absolute' as const,
+      left: `${left}px`,
+      top: `${top}px`,
+    }
+  }
 
   const handleSave = () => {
     if (content.trim()) {
@@ -66,13 +110,18 @@ export default function CommentModal({
     return `${mins}:${secs.toString().padStart(2, '0')}`
   }
 
+  const modalStyle = getModalStyle()
+
   return (
     <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/50 z-50"
       onClick={onClose}
+      style={position ? {} : { display: 'flex', alignItems: 'center', justifyContent: 'center' }}
     >
       <div
+        ref={modalRef}
         className="bg-background border border-border rounded-lg p-4 w-96 shadow-lg"
+        style={modalStyle}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-3">

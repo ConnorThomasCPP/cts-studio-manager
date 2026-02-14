@@ -26,6 +26,7 @@ export default function StemPlayer({ trackId, stems }: StemPlayerProps) {
     stemId: string
     stemName: string
     timestamp: number
+    position: { x: number; y: number }
   } | null>(null)
   const [currentUserId, setCurrentUserId] = useState<string>()
 
@@ -215,8 +216,8 @@ export default function StemPlayer({ trackId, stems }: StemPlayerProps) {
   }, [isPlaying])
 
   // Comment handlers
-  const handleCommentClick = (stemId: string, stemName: string, timestamp: number) => {
-    setCommentModalData({ stemId, stemName, timestamp })
+  const handleCommentClick = (stemId: string, stemName: string, timestamp: number, position: { x: number; y: number }) => {
+    setCommentModalData({ stemId, stemName, timestamp, position })
     setCommentModalOpen(true)
   }
 
@@ -274,8 +275,8 @@ export default function StemPlayer({ trackId, stems }: StemPlayerProps) {
             stem={stem}
             trackId={trackId}
             comments={comments.filter((c) => c.stem_id === stem.id)}
-            onCommentClick={(timestamp) =>
-              handleCommentClick(stem.id, stem.name, timestamp)
+            onCommentClick={(timestamp, position) =>
+              handleCommentClick(stem.id, stem.name, timestamp, position)
             }
           />
         ))}
@@ -292,6 +293,7 @@ export default function StemPlayer({ trackId, stems }: StemPlayerProps) {
           onSave={handleCommentSave}
           timestamp={commentModalData.timestamp}
           stemName={commentModalData.stemName}
+          position={commentModalData.position}
         />
       )}
 

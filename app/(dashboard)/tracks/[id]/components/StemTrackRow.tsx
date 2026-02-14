@@ -16,7 +16,7 @@ interface StemTrackRowProps {
   stem: Stem
   trackId: string
   comments?: StemComment[]
-  onCommentClick?: (timestamp: number) => void
+  onCommentClick?: (timestamp: number, position: { x: number; y: number }) => void
 }
 
 export default function StemTrackRow({

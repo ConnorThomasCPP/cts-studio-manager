@@ -11,7 +11,7 @@ interface WaveformCanvasProps {
   color: string
   stemId: string
   comments?: StemComment[]
-  onCommentClick?: (timestamp: number) => void
+  onCommentClick?: (timestamp: number, position: { x: number; y: number }) => void
   stemName?: string
 }
 
@@ -88,8 +88,8 @@ export default function WaveformCanvas({
     const newTime = percent * duration
 
     if (isCommentMode && onCommentClick) {
-      // In comment mode, trigger comment modal
-      onCommentClick(newTime)
+      // In comment mode, trigger comment modal at click position
+      onCommentClick(newTime, { x: e.clientX, y: e.clientY })
     } else {
       // Normal mode, seek to position
       seek(newTime)
