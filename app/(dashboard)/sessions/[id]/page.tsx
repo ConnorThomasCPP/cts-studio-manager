@@ -69,7 +69,7 @@ export default function SessionDetailPage({
         engineer: data.engineer,
         start_time: data.start_time.slice(0, 16), // Format for datetime-local
         end_time: data.end_time ? data.end_time.slice(0, 16) : '',
-        status: data.status,
+        status: data.status as 'planned' | 'active' | 'completed' | 'cancelled',
         notes: data.notes || '',
         project_id: data.project_id || ''
       })
@@ -115,7 +115,7 @@ export default function SessionDetailPage({
         engineer: session.engineer,
         start_time: session.start_time.slice(0, 16),
         end_time: session.end_time ? session.end_time.slice(0, 16) : '',
-        status: session.status,
+        status: session.status as 'planned' | 'active' | 'completed' | 'cancelled',
         notes: session.notes || '',
         project_id: session.project_id || ''
       })
