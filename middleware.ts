@@ -52,6 +52,7 @@ export async function middleware(request: NextRequest) {
     '/tracks',
     '/profile',
     '/settings',
+    '/account',
   ]
 
   const isProtectedRoute = protectedPaths.some((path) =>

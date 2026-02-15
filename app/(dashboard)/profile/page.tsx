@@ -52,21 +52,12 @@ export default function ProfilePage() {
   async function loadProfile() {
     setLoading(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) throw new Error('Not authenticated')
-
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', user.id)
-        .single()
-
-      if (error) throw error
-
-      setProfile({
-        ...data,
-        email: user.email || '',
-      })
+      const response = await fetch('/api/profile')
+      if (!response.ok) {
+        throw new Error('Failed to fetch profile')
+      }
+      const data = await response.json()
+      setProfile(data)
     } catch (error) {
       console.error('Failed to load profile:', error)
       toast.error('Failed to load profile')
@@ -107,16 +98,20 @@ export default function ProfilePage() {
       // Update name to be the combination (fallback to 'User' if both names are empty)
       const name = [firstName, lastName].filter(Boolean).join(' ') || 'User'
 
-      const { error } = await supabase
-        .from('users')
-        .update({
+      const response = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           first_name: firstName || null,
           last_name: lastName || null,
           name: name,
-        })
-        .eq('id', profile.id)
+        }),
+      })
 
-      if (error) throw error
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to save profile')
+      }
 
       toast.success('Profile updated successfully')
       loadProfile()
@@ -164,12 +159,15 @@ export default function ProfilePage() {
         .getPublicUrl(filePath)
 
       // Update profile
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ photo_url: publicUrl })
-        .eq('id', profile.id)
-
-      if (updateError) throw updateError
+      const updateResponse = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photo_url: publicUrl }),
+      })
+      if (!updateResponse.ok) {
+        const errorData = await updateResponse.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to update profile photo')
+      }
 
       toast.success('Profile photo updated')
       loadProfile()
@@ -185,12 +183,15 @@ export default function ProfilePage() {
     if (!profile) return
 
     try {
-      const { error } = await supabase
-        .from('users')
-        .update({ photo_url: null })
-        .eq('id', profile.id)
-
-      if (error) throw error
+      const response = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ photo_url: null }),
+      })
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.error || 'Failed to remove photo')
+      }
 
       toast.success('Profile photo removed')
       loadProfile()

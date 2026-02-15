@@ -6,8 +6,10 @@
  */
 
 import { redirect } from 'next/navigation'
+import { cookies } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { AppLayout } from '@/components/AppLayout'
+import { ACTIVE_ACCOUNT_COOKIE, resolveAccountContext } from '@/lib/account-context'
 
 export default async function DashboardLayout({
   children,
@@ -30,6 +32,14 @@ export default async function DashboardLayout({
     .eq('id', user.id)
     .single()
 
+  const cookieStore = await cookies()
+  const preferredAccountId = cookieStore.get(ACTIVE_ACCOUNT_COOKIE)?.value
+  const accountContext = await resolveAccountContext(supabase, user.id, preferredAccountId)
+
+  if (!accountContext) {
+    redirect('/account/setup')
+  }
+
   const handleSignOut = async () => {
     'use server'
     const supabase = await createClient()
@@ -40,9 +50,25 @@ export default async function DashboardLayout({
   const userData = {
     name: profile?.name || user.email?.split('@')[0] || 'User',
     email: user.email || '',
-    role: profile?.role || 'viewer',
+    role: accountContext.currentRole,
     photo_url: profile?.photo_url || null,
   }
 
-  return <AppLayout user={userData}>{children}</AppLayout>
+  return (
+    <AppLayout
+      user={userData}
+      currentAccount={{
+        id: accountContext.currentAccountId,
+        name: accountContext.currentAccountName,
+      }}
+      currentAccountTheme={accountContext.currentAccountTheme}
+      accounts={accountContext.memberships.map((m) => ({
+        id: m.accountId,
+        name: m.accountName,
+        role: m.role,
+      }))}
+    >
+      {children}
+    </AppLayout>
+  )
 }

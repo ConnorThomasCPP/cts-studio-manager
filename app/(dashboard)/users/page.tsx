@@ -112,6 +112,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<TeamUser[]>([])
   const [loading, setLoading] = useState(true)
   const [accessDenied, setAccessDenied] = useState(false)
+  const [canManageUsers, setCanManageUsers] = useState(false)
   const [inviteDialogOpen, setInviteDialogOpen] = useState(false)
   const [changeRoleDialogOpen, setChangeRoleDialogOpen] = useState(false)
   const [removeDialogOpen, setRemoveDialogOpen] = useState(false)
@@ -123,6 +124,18 @@ export default function UsersPage() {
 
   const loadUsers = useCallback(async () => {
     try {
+      const accountResponse = await fetch('/api/accounts')
+      if (!accountResponse.ok) {
+        throw new Error('Failed to load account context')
+      }
+      const accountData = await accountResponse.json()
+      const isAdmin = accountData.currentRole === 'admin'
+      setCanManageUsers(isAdmin)
+      if (!isAdmin) {
+        setAccessDenied(true)
+        return
+      }
+
       const response = await fetch('/api/users')
       if (response.status === 403) {
         setAccessDenied(true)
@@ -273,7 +286,7 @@ export default function UsersPage() {
             Manage your studio team and permissions
           </p>
         </div>
-        <Button onClick={() => setInviteDialogOpen(true)}>
+        <Button onClick={() => setInviteDialogOpen(true)} disabled={!canManageUsers}>
           <UserPlus className="mr-2 h-4 w-4" />
           Invite User
         </Button>

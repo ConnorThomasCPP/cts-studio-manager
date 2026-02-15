@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   LayoutDashboard,
   Package,
@@ -14,7 +14,6 @@ import {
   ScrollText,
   Settings,
   Folder,
-  ChevronDown,
   ChevronRight,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
@@ -38,30 +37,60 @@ const navItems: NavItem[] = [
       { to: "/scan", icon: ScanBarcode, label: "Scanner" },
     ]
   },
-  { to: "/sessions", icon: CalendarClock, label: "Sessions" },
-  { to: "/clients", icon: Users, label: "Clients" },
-  { to: "/projects", icon: Folder, label: "Projects" },
-  { to: "/tracks", icon: Music, label: "Tracks" },
-  { to: "/transactions", icon: ScrollText, label: "Transactions" },
-  { to: "/users", icon: UserCog, label: "Team", adminOnly: true },
-  { to: "/admin", icon: Settings, label: "Settings" },
+  {
+    to: "/clients",
+    icon: Users,
+    label: "Clients",
+    submenu: [
+      { to: "/clients", icon: Users, label: "Clients" },
+      { to: "/sessions", icon: CalendarClock, label: "Sessions" },
+      { to: "/projects", icon: Folder, label: "Projects" },
+      { to: "/tracks", icon: Music, label: "Tracks" },
+    ],
+  },
+  {
+    to: "/admin",
+    icon: Settings,
+    label: "Admin",
+    adminOnly: true,
+    submenu: [
+      { to: "/admin", icon: Settings, label: "Admin Settings" },
+      { to: "/users", icon: UserCog, label: "Team" },
+      { to: "/transactions", icon: ScrollText, label: "Transactions" },
+    ],
+  },
 ];
 
 interface AppSidebarProps {
   collapsed: boolean;
   userRole?: string;
+  accountName?: string;
   onToggle?: () => void;
 }
 
-export function AppSidebar({ collapsed, userRole }: AppSidebarProps) {
+export function AppSidebar({ collapsed, userRole, accountName }: AppSidebarProps) {
   const pathname = usePathname();
-  const [expandedItems, setExpandedItems] = useState<string[]>(["/assets"]);
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const visibleNavItems = navItems.filter((item) => !item.adminOnly || userRole === "admin");
 
-  const toggleExpanded = (to: string) => {
-    setExpandedItems(prev =>
-      prev.includes(to) ? prev.filter(item => item !== to) : [...prev, to]
-    );
+  const cancelCloseTimer = () => {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current);
+      closeTimerRef.current = null;
+    }
+  };
+
+  const openFlyout = (itemToOpen: string) => {
+    cancelCloseTimer();
+    setHoveredItem(itemToOpen);
+  };
+
+  const scheduleFlyoutClose = () => {
+    cancelCloseTimer();
+    closeTimerRef.current = setTimeout(() => {
+      setHoveredItem(null);
+    }, 180);
   };
 
   return (
@@ -78,10 +107,10 @@ export function AppSidebar({ collapsed, userRole }: AppSidebarProps) {
         {!collapsed && (
           <div className="flex flex-col">
             <span className="text-sm font-bold tracking-tight text-foreground">
-              Studio Manager
+              {accountName || "Studio Manager"}
             </span>
             <span className="text-[10px] text-muted-foreground">
-              by Connor Thomas
+              Studio Manager Pro
             </span>
           </div>
         )}
@@ -91,17 +120,24 @@ export function AppSidebar({ collapsed, userRole }: AppSidebarProps) {
       <nav className="flex-1 space-y-1 p-3">
         {visibleNavItems.map((item) => {
           const isActive = pathname === item.to || pathname?.startsWith(item.to + "/");
-          const isExpanded = expandedItems.includes(item.to);
           const hasSubmenu = item.submenu && item.submenu.length > 0;
+          const isHovered = hoveredItem === item.to;
+          const hasActiveSubItem = !!item.submenu?.some((subitem) => pathname === subitem.to || pathname?.startsWith(subitem.to + "/"));
+          const isGroupActive = isActive || hasActiveSubItem;
 
           return (
-            <div key={item.to}>
+            <div
+              key={item.to}
+              className="relative"
+              onMouseEnter={() => hasSubmenu && openFlyout(item.to)}
+              onMouseLeave={() => hasSubmenu && scheduleFlyoutClose()}
+            >
               {hasSubmenu ? (
                 <>
-                  <button
-                    onClick={() => toggleExpanded(item.to)}
+                  <Link
+                    href={item.to}
                     className={`w-full flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
-                      isActive
+                      isGroupActive
                         ? "bg-primary/10 text-primary"
                         : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                     }`}
@@ -110,33 +146,40 @@ export function AppSidebar({ collapsed, userRole }: AppSidebarProps) {
                     {!collapsed && (
                       <>
                         <span className="flex-1 text-left">{item.label}</span>
-                        {isExpanded ? (
-                          <ChevronDown className="h-4 w-4 shrink-0" />
-                        ) : (
-                          <ChevronRight className="h-4 w-4 shrink-0" />
-                        )}
+                        <ChevronRight className="h-4 w-4 shrink-0" />
                       </>
                     )}
-                  </button>
-                  {!collapsed && isExpanded && (
-                    <div className="ml-4 mt-1 space-y-1">
-                      {item.submenu?.map((subitem) => {
-                        const isSubActive = pathname === subitem.to;
-                        return (
-                          <Link
-                            key={subitem.to}
-                            href={subitem.to}
-                            className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors ${
-                              isSubActive
-                                ? "bg-primary/10 text-primary"
-                                : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
-                            }`}
-                          >
-                            {subitem.icon && <subitem.icon className="h-4 w-4 shrink-0" />}
-                            <span>{subitem.label}</span>
-                          </Link>
-                        );
-                      })}
+                  </Link>
+                  {isHovered && (
+                    <div
+                      className={`absolute top-0 z-50 w-56 rounded-xl border border-sidebar-border bg-sidebar-background p-2 shadow-xl ${
+                        collapsed ? "left-[3.5rem]" : "left-[14.8rem]"
+                      }`}
+                      onMouseEnter={cancelCloseTimer}
+                      onMouseLeave={scheduleFlyoutClose}
+                    >
+                      <div className="mb-1 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                        {item.label}
+                      </div>
+                      <div className="space-y-1">
+                        {item.submenu?.map((subitem) => {
+                          const isSubActive = pathname === subitem.to || pathname?.startsWith(subitem.to + "/");
+                          return (
+                            <Link
+                              key={subitem.to}
+                              href={subitem.to}
+                              className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-colors ${
+                                isSubActive
+                                  ? "bg-primary/10 text-primary"
+                                  : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                              }`}
+                            >
+                              {subitem.icon && <subitem.icon className="h-4 w-4 shrink-0" />}
+                              <span>{subitem.label}</span>
+                            </Link>
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </>
@@ -164,13 +207,12 @@ export function AppSidebar({ collapsed, userRole }: AppSidebarProps) {
 /* Mobile bottom nav */
 export function MobileNav() {
   const pathname = usePathname();
-  // Include Scanner in mobile nav by flattening submenu items
   const mobileItems = [
-    navItems[0], // Dashboard
-    navItems[1], // Assets
-    { to: "/scan", icon: ScanBarcode, label: "Scanner" }, // Scanner from submenu
-    navItems[2], // Sessions
-    navItems[3], // Clients
+    { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
+    { to: "/assets", icon: Package, label: "Assets" },
+    { to: "/scan", icon: ScanBarcode, label: "Scanner" },
+    { to: "/sessions", icon: CalendarClock, label: "Sessions" },
+    { to: "/clients", icon: Users, label: "Clients" },
   ];
 
   return (

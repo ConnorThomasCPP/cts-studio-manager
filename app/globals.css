@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
 @import "tailwindcss";
 @import "tw-animate-css";
@@ -9,7 +9,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: 'Inter', var(--font-geist-sans);
+  --font-sans: 'Space Grotesk', 'Inter', var(--font-geist-sans);
   --font-mono: 'JetBrains Mono', var(--font-geist-mono);
   --color-card: var(--card);
   --color-card-foreground: var(--card-foreground);
@@ -48,52 +48,130 @@
   --radius-xl: calc(var(--radius) + 4px);
 }
 
+html[data-account-theme="neon-space-station"],
+[data-account-theme="neon-space-station"] {
+  --background: hsl(260 25% 6%);
+  --foreground: hsl(60 30% 96%);
+  --card: hsl(260 22% 10%);
+  --card-foreground: hsl(60 30% 96%);
+  --popover: hsl(260 20% 14%);
+  --popover-foreground: hsl(60 30% 96%);
+  --primary: hsl(280 100% 65%);
+  --primary-foreground: hsl(260 25% 4%);
+  --secondary: hsl(260 20% 14%);
+  --secondary-foreground: hsl(60 30% 96%);
+  --muted: hsl(260 18% 20%);
+  --muted-foreground: hsl(260 10% 50%);
+  --accent: hsl(170 100% 50%);
+  --accent-foreground: hsl(260 25% 4%);
+  --destructive: hsl(350 80% 55%);
+  --destructive-foreground: hsl(60 30% 96%);
+  --border: hsl(260 15% 18%);
+  --input: hsl(260 20% 14%);
+  --ring: hsl(280 100% 65%);
+  --sidebar: hsl(260 22% 10%);
+  --sidebar-foreground: hsl(60 30% 96%);
+  --sidebar-primary: hsl(280 100% 65%);
+  --sidebar-primary-foreground: hsl(260 25% 4%);
+  --sidebar-accent: hsl(260 20% 14%);
+  --sidebar-accent-foreground: hsl(60 30% 96%);
+  --sidebar-border: hsl(260 15% 18%);
+  --status-active: hsl(150 100% 50%);
+  --status-warning: hsl(45 100% 55%);
+  --status-error: hsl(350 80% 55%);
+  --status-info: hsl(200 100% 60%);
+  --status-idle: hsl(260 10% 45%);
+  --surface-0: hsl(260 25% 6%);
+  --surface-1: hsl(260 22% 10%);
+  --surface-2: hsl(260 20% 14%);
+  --surface-3: hsl(260 18% 20%);
+}
+
+html[data-account-theme="neon-daylight"],
+[data-account-theme="neon-daylight"] {
+  --background: hsl(40 30% 97%);
+  --foreground: hsl(260 35% 9%);
+  --card: hsl(40 20% 94%);
+  --card-foreground: hsl(260 35% 9%);
+  --popover: hsl(260 10% 90%);
+  --popover-foreground: hsl(260 35% 9%);
+  --primary: hsl(280 85% 55%);
+  --primary-foreground: hsl(40 30% 97%);
+  --secondary: hsl(260 10% 90%);
+  --secondary-foreground: hsl(260 35% 9%);
+  --muted: hsl(260 10% 85%);
+  --muted-foreground: hsl(260 18% 30%);
+  --accent: hsl(170 80% 38%);
+  --accent-foreground: hsl(40 30% 97%);
+  --destructive: hsl(350 80% 55%);
+  --destructive-foreground: hsl(40 30% 97%);
+  --border: hsl(260 12% 87%);
+  --input: hsl(260 10% 90%);
+  --ring: hsl(280 85% 55%);
+  --sidebar: hsl(40 20% 94%);
+  --sidebar-foreground: hsl(260 35% 9%);
+  --sidebar-primary: hsl(280 85% 55%);
+  --sidebar-primary-foreground: hsl(40 30% 97%);
+  --sidebar-accent: hsl(260 10% 90%);
+  --sidebar-accent-foreground: hsl(260 35% 9%);
+  --sidebar-border: hsl(260 12% 87%);
+  --status-active: hsl(150 100% 50%);
+  --status-warning: hsl(45 100% 55%);
+  --status-error: hsl(350 80% 55%);
+  --status-info: hsl(200 100% 60%);
+  --status-idle: hsl(260 10% 45%);
+  --surface-0: hsl(40 30% 97%);
+  --surface-1: hsl(40 20% 94%);
+  --surface-2: hsl(260 10% 90%);
+  --surface-3: hsl(260 10% 85%);
+}
+
 :root {
   --radius: 0.5rem;
 
-  /* Dark studio theme by default */
-  --background: oklch(0.13 0.01 255);
-  --foreground: oklch(0.92 0.01 255);
-  --card: oklch(0.16 0.01 255);
-  --card-foreground: oklch(0.92 0.01 255);
-  --popover: oklch(0.17 0.01 255);
-  --popover-foreground: oklch(0.92 0.01 255);
-  --primary: oklch(0.61 0.23 250);
-  --primary-foreground: oklch(0.98 0 0);
-  --secondary: oklch(0.2 0.01 255);
-  --secondary-foreground: oklch(0.85 0.01 255);
-  --muted: oklch(0.18 0.01 255);
-  --muted-foreground: oklch(0.55 0.01 255);
-  --accent: oklch(0.61 0.23 250);
-  --accent-foreground: oklch(0.98 0 0);
+  /* Studio default: neutral dark modern grey */
+  --background: oklch(0.13 0 0);
+  --foreground: oklch(0.92 0 0);
+  --card: oklch(0.16 0 0);
+  --card-foreground: oklch(0.92 0 0);
+  --popover: oklch(0.17 0 0);
+  --popover-foreground: oklch(0.92 0 0);
+  --primary: oklch(0.78 0 0);
+  --primary-foreground: oklch(0.14 0 0);
+  --secondary: oklch(0.2 0 0);
+  --secondary-foreground: oklch(0.85 0 0);
+  --muted: oklch(0.18 0 0);
+  --muted-foreground: oklch(0.58 0 0);
+  --accent: oklch(0.24 0 0);
+  --accent-foreground: oklch(0.92 0 0);
   --destructive: oklch(0.58 0.24 27);
   --destructive-foreground: oklch(0.98 0 0);
-  --border: oklch(0.22 0.01 255);
-  --input: oklch(0.22 0.01 255);
-  --ring: oklch(0.61 0.23 250);
+  --border: oklch(0.24 0 0);
+  --input: oklch(0.24 0 0);
+  --ring: oklch(0.78 0 0);
 
   /* Sidebar colors */
-  --sidebar: oklch(0.11 0.01 255);
-  --sidebar-foreground: oklch(0.85 0.01 255);
-  --sidebar-primary: oklch(0.61 0.23 250);
-  --sidebar-primary-foreground: oklch(0.98 0 0);
-  --sidebar-accent: oklch(0.18 0.01 255);
-  --sidebar-accent-foreground: oklch(0.92 0.01 255);
-  --sidebar-border: oklch(0.18 0.01 255);
-  --sidebar-ring: oklch(0.61 0.23 250);
+  --sidebar: oklch(0.11 0 0);
+  --sidebar-foreground: oklch(0.85 0 0);
+  --sidebar-primary: oklch(0.78 0 0);
+  --sidebar-primary-foreground: oklch(0.14 0 0);
+  --sidebar-accent: oklch(0.18 0 0);
+  --sidebar-accent-foreground: oklch(0.92 0 0);
+  --sidebar-border: oklch(0.2 0 0);
+  --sidebar-ring: oklch(0.78 0 0);
 
   /* Status colors */
   --status-active: oklch(0.58 0.18 155);
   --status-warning: oklch(0.68 0.20 70);
   --status-error: oklch(0.58 0.24 27);
-  --status-info: oklch(0.61 0.23 250);
-  --status-idle: oklch(0.55 0.01 255);
+  --status-info: oklch(0.72 0.03 220);
+  --status-idle: oklch(0.55 0 0);
 
   /* Surface layers */
-  --surface-0: oklch(0.13 0.01 255);
-  --surface-1: oklch(0.16 0.01 255);
-  --surface-2: oklch(0.18 0.01 255);
-  --surface-3: oklch(0.22 0.01 255);
+  --surface-0: oklch(0.13 0 0);
+  --surface-1: oklch(0.16 0 0);
+  --surface-2: oklch(0.18 0 0);
+  --surface-3: oklch(0.22 0 0);
 }
 
 @layer base {
@@ -112,15 +190,37 @@
 
 @layer utilities {
   .stat-card-gradient {
-    background: linear-gradient(135deg, oklch(0.18 0.01 255) 0%, oklch(0.16 0.01 255) 100%);
+    background: linear-gradient(135deg, oklch(0.18 0 0) 0%, oklch(0.16 0 0) 100%);
   }
 
   .glow-primary {
-    box-shadow: 0 0 20px -5px oklch(0.61 0.23 250 / 0.3);
+    box-shadow: 0 0 20px -5px oklch(0.78 0 0 / 0.3);
   }
 
   .glow-success {
     box-shadow: 0 0 20px -5px oklch(0.58 0.18 155 / 0.3);
+  }
+
+  html[data-account-theme="neon-space-station"] .theme-gradient-cta,
+  html[data-account-theme="neon-daylight"] .theme-gradient-cta,
+  [data-account-theme="neon-space-station"] .theme-gradient-cta,
+  [data-account-theme="neon-daylight"] .theme-gradient-cta {
+    background: linear-gradient(
+      135deg,
+      hsl(280 100% 65%),
+      hsl(320 100% 60%),
+      hsl(170 100% 50%)
+    );
+    color: hsl(260 25% 4%);
+  }
+
+  html[data-account-theme="neon-daylight"] h1,
+  html[data-account-theme="neon-daylight"] h2,
+  html[data-account-theme="neon-daylight"] h3,
+  [data-account-theme="neon-daylight"] h1,
+  [data-account-theme="neon-daylight"] h2,
+  [data-account-theme="neon-daylight"] h3 {
+    color: hsl(260 40% 8%);
   }
 }
 
@@ -132,33 +232,33 @@
 .calendar-container .rbc-header {
   padding: 12px 8px;
   font-weight: 600;
-  border-bottom: 2px solid oklch(0.22 0.01 255);
-  background: oklch(0.16 0.01 255);
-  color: oklch(0.85 0.01 255);
+  border-bottom: 2px solid oklch(0.24 0 0);
+  background: oklch(0.16 0 0);
+  color: oklch(0.85 0 0);
 }
 
 .calendar-container .rbc-month-view,
 .calendar-container .rbc-time-view {
-  background: oklch(0.13 0.01 255);
-  border: 1px solid oklch(0.22 0.01 255);
+  background: oklch(0.13 0 0);
+  border: 1px solid oklch(0.24 0 0);
   border-radius: 8px;
   overflow: hidden;
 }
 
 .calendar-container .rbc-day-bg {
-  border-left: 1px solid oklch(0.22 0.01 255);
+  border-left: 1px solid oklch(0.24 0 0);
 }
 
 .calendar-container .rbc-month-row {
-  border-top: 1px solid oklch(0.22 0.01 255);
+  border-top: 1px solid oklch(0.24 0 0);
 }
 
 .calendar-container .rbc-off-range-bg {
-  background: oklch(0.10 0.01 255);
+  background: oklch(0.1 0 0);
 }
 
 .calendar-container .rbc-today {
-  background: oklch(0.18 0.05 250);
+  background: oklch(0.2 0.01 260);
 }
 
 .calendar-container .rbc-event {
@@ -181,15 +281,15 @@
 }
 
 .calendar-container .rbc-time-slot {
-  border-top: 1px solid oklch(0.22 0.01 255);
+  border-top: 1px solid oklch(0.24 0 0);
 }
 
 .calendar-container .rbc-time-header-content {
-  border-left: 1px solid oklch(0.22 0.01 255);
+  border-left: 1px solid oklch(0.24 0 0);
 }
 
 .calendar-container .rbc-time-content {
-  border-top: 2px solid oklch(0.22 0.01 255);
+  border-top: 2px solid oklch(0.24 0 0);
 }
 
 .calendar-container .rbc-current-time-indicator {
@@ -206,21 +306,21 @@
 }
 
 .calendar-container .rbc-day-slot .rbc-time-slot {
-  color: oklch(0.55 0.01 255);
+  color: oklch(0.58 0 0);
 }
 
 .calendar-container .rbc-label {
-  color: oklch(0.55 0.01 255);
+  color: oklch(0.58 0 0);
   font-size: 12px;
 }
 
 .calendar-container .rbc-time-header-gutter {
-  background: oklch(0.16 0.01 255);
-  border-right: 1px solid oklch(0.22 0.01 255);
+  background: oklch(0.16 0 0);
+  border-right: 1px solid oklch(0.24 0 0);
 }
 
 .calendar-container .rbc-allday-cell {
-  background: oklch(0.16 0.01 255);
+  background: oklch(0.16 0 0);
 }
 
 /* Make calendar events more visible */

@@ -135,7 +135,7 @@ export default function NewAssetPage() {
 
       if (result.estimatedCost) {
         setFormData({ ...formData, replacement_cost: result.estimatedCost.toString() })
-        toast.success(`Found replacement cost: $${result.estimatedCost} (${result.confidence} confidence)`)
+        toast.success(`Found replacement cost: £${result.estimatedCost} (${result.confidence} confidence)`)
         if (result.notes) {
           toast.info(result.notes, { duration: 5000 })
         }
@@ -358,7 +358,7 @@ export default function NewAssetPage() {
             <div className="space-y-2">
               <Label htmlFor="purchase_value">Purchase Value</Label>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">£</span>
                 <Input
                   id="purchase_value"
                   type="number"

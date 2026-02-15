@@ -14,8 +14,89 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_memberships: {
+        Row: {
+          account_id: string
+          created_at: string | null
+          id: string
+          role: string
+          status: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          created_at?: string | null
+          id?: string
+          role: string
+          status?: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          created_at?: string | null
+          id?: string
+          role?: string
+          status?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_memberships_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "account_memberships_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      accounts: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          id: string
+          name: string
+          slug: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          name: string
+          slug: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accounts_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       assets: {
         Row: {
+          account_id: string
           asset_code: string
           brand: string | null
           category_id: string | null
@@ -36,6 +117,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          account_id?: string
           asset_code: string
           brand?: string | null
           category_id?: string | null
@@ -56,6 +138,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          account_id?: string
           asset_code?: string
           brand?: string | null
           category_id?: string | null
@@ -76,6 +159,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "assets_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "assets_category_id_fkey"
             columns: ["category_id"]
@@ -109,6 +199,7 @@ export type Database = {
       calendar_connections: {
         Row: {
           access_token: string
+          account_id: string
           auto_create_events: boolean | null
           auto_import_events: boolean | null
           calendar_id: string | null
@@ -129,6 +220,7 @@ export type Database = {
         }
         Insert: {
           access_token: string
+          account_id?: string
           auto_create_events?: boolean | null
           auto_import_events?: boolean | null
           calendar_id?: string | null
@@ -149,6 +241,7 @@ export type Database = {
         }
         Update: {
           access_token?: string
+          account_id?: string
           auto_create_events?: boolean | null
           auto_import_events?: boolean | null
           calendar_id?: string | null
@@ -169,6 +262,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "calendar_connections_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "calendar_connections_user_id_fkey"
             columns: ["user_id"]
             isOneToOne: false
@@ -179,6 +279,7 @@ export type Database = {
       }
       calendar_syncs: {
         Row: {
+          account_id: string
           connection_id: string
           created_at: string | null
           event_updated_at: string | null
@@ -195,6 +296,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          account_id?: string
           connection_id: string
           created_at?: string | null
           event_updated_at?: string | null
@@ -211,6 +313,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          account_id?: string
           connection_id?: string
           created_at?: string | null
           event_updated_at?: string | null
@@ -227,6 +330,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "calendar_syncs_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "calendar_syncs_connection_id_fkey"
             columns: ["connection_id"]
@@ -245,27 +355,39 @@ export type Database = {
       }
       categories: {
         Row: {
+          account_id: string
           color: string | null
           created_at: string | null
           id: string
           name: string
         }
         Insert: {
+          account_id?: string
           color?: string | null
           created_at?: string | null
           id?: string
           name: string
         }
         Update: {
+          account_id?: string
           color?: string | null
           created_at?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "categories_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       clients: {
         Row: {
+          account_id: string
           billing_address: string | null
           billing_email: string | null
           company: string | null
@@ -281,6 +403,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          account_id?: string
           billing_address?: string | null
           billing_email?: string | null
           company?: string | null
@@ -296,6 +419,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          account_id?: string
           billing_address?: string | null
           billing_email?: string | null
           company?: string | null
@@ -312,6 +436,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "clients_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "clients_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
@@ -322,27 +453,39 @@ export type Database = {
       }
       locations: {
         Row: {
+          account_id: string
           created_at: string | null
           description: string | null
           id: string
           name: string
         }
         Insert: {
+          account_id?: string
           created_at?: string | null
           description?: string | null
           id?: string
           name: string
         }
         Update: {
+          account_id?: string
           created_at?: string | null
           description?: string | null
           id?: string
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "locations_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       projects: {
         Row: {
+          account_id: string
           client_id: string
           created_at: string | null
           created_by: string | null
@@ -360,6 +503,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          account_id?: string
           client_id: string
           created_at?: string | null
           created_by?: string | null
@@ -377,6 +521,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          account_id?: string
           client_id?: string
           created_at?: string | null
           created_by?: string | null
@@ -395,6 +540,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "projects_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "projects_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
@@ -412,6 +564,7 @@ export type Database = {
       }
       session_assets: {
         Row: {
+          account_id: string
           asset_id: string
           check_in_condition: string | null
           check_out_condition: string | null
@@ -422,6 +575,7 @@ export type Database = {
           session_id: string
         }
         Insert: {
+          account_id?: string
           asset_id: string
           check_in_condition?: string | null
           check_out_condition?: string | null
@@ -432,6 +586,7 @@ export type Database = {
           session_id: string
         }
         Update: {
+          account_id?: string
           asset_id?: string
           check_in_condition?: string | null
           check_out_condition?: string | null
@@ -442,6 +597,13 @@ export type Database = {
           session_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "session_assets_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "session_assets_asset_id_fkey"
             columns: ["asset_id"]
@@ -460,6 +622,7 @@ export type Database = {
       }
       session_attendees: {
         Row: {
+          account_id: string
           created_at: string | null
           id: string
           is_organizer: boolean | null
@@ -467,6 +630,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string
           created_at?: string | null
           id?: string
           is_organizer?: boolean | null
@@ -474,6 +638,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string
           created_at?: string | null
           id?: string
           is_organizer?: boolean | null
@@ -481,6 +646,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "session_attendees_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "session_attendees_session_id_fkey"
             columns: ["session_id"]
@@ -499,6 +671,7 @@ export type Database = {
       }
       sessions: {
         Row: {
+          account_id: string
           client_name: string
           created_at: string | null
           created_by: string | null
@@ -513,6 +686,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          account_id?: string
           client_name: string
           created_at?: string | null
           created_by?: string | null
@@ -527,6 +701,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          account_id?: string
           client_name?: string
           created_at?: string | null
           created_by?: string | null
@@ -541,6 +716,13 @@ export type Database = {
           updated_at?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "sessions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "sessions_created_by_fkey"
             columns: ["created_by"]
@@ -598,6 +780,7 @@ export type Database = {
       }
       stem_comments: {
         Row: {
+          account_id: string
           content: string
           created_at: string | null
           id: string
@@ -606,6 +789,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string
           content: string
           created_at?: string | null
           id?: string
@@ -614,6 +798,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string
           content?: string
           created_at?: string | null
           id?: string
@@ -622,6 +807,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "stem_comments_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "stem_comments_stem_id_fkey"
             columns: ["stem_id"]
@@ -640,6 +832,7 @@ export type Database = {
       }
       stems: {
         Row: {
+          account_id: string
           color: string | null
           created_at: string | null
           created_by: string | null
@@ -658,6 +851,7 @@ export type Database = {
           waveform_data: Json | null
         }
         Insert: {
+          account_id?: string
           color?: string | null
           created_at?: string | null
           created_by?: string | null
@@ -676,6 +870,7 @@ export type Database = {
           waveform_data?: Json | null
         }
         Update: {
+          account_id?: string
           color?: string | null
           created_at?: string | null
           created_by?: string | null
@@ -695,6 +890,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "stems_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "stems_created_by_fkey"
             columns: ["created_by"]
             isOneToOne: false
@@ -712,6 +914,7 @@ export type Database = {
       }
       tracks: {
         Row: {
+          account_id: string
           bpm: number | null
           created_at: string | null
           created_by: string | null
@@ -727,6 +930,7 @@ export type Database = {
           waveform_data: Json | null
         }
         Insert: {
+          account_id?: string
           bpm?: number | null
           created_at?: string | null
           created_by?: string | null
@@ -742,6 +946,7 @@ export type Database = {
           waveform_data?: Json | null
         }
         Update: {
+          account_id?: string
           bpm?: number | null
           created_at?: string | null
           created_by?: string | null
@@ -757,6 +962,13 @@ export type Database = {
           waveform_data?: Json | null
         }
         Relationships: [
+          {
+            foreignKeyName: "tracks_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "tracks_created_by_fkey"
             columns: ["created_by"]
@@ -782,6 +994,7 @@ export type Database = {
       }
       transactions: {
         Row: {
+          account_id: string
           asset_id: string
           condition: string | null
           from_location_id: string | null
@@ -797,6 +1010,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          account_id?: string
           asset_id: string
           condition?: string | null
           from_location_id?: string | null
@@ -812,6 +1026,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          account_id?: string
           asset_id?: string
           condition?: string | null
           from_location_id?: string | null
@@ -827,6 +1042,13 @@ export type Database = {
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "transactions_asset_id_fkey"
             columns: ["asset_id"]
@@ -866,6 +1088,7 @@ export type Database = {
       }
       users: {
         Row: {
+          active_account_id: string | null
           created_at: string | null
           first_name: string | null
           id: string
@@ -876,6 +1099,7 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          active_account_id?: string | null
           created_at?: string | null
           first_name?: string | null
           id: string
@@ -886,6 +1110,7 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          active_account_id?: string | null
           created_at?: string | null
           first_name?: string | null
           id?: string
@@ -895,7 +1120,15 @@ export type Database = {
           role?: string
           updated_at?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "users_active_account_id_fkey"
+            columns: ["active_account_id"]
+            isOneToOne: false
+            referencedRelation: "accounts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
@@ -940,6 +1173,7 @@ export type Database = {
         Args: { p_category_name?: string }
         Returns: string
       }
+      get_active_account_id: { Args: never; Returns: string }
       get_active_session_assets: {
         Args: { p_session_id: string }
         Returns: {
@@ -1002,9 +1236,17 @@ export type Database = {
         }[]
       }
       get_user_role: { Args: never; Returns: string }
+      has_active_account_role: {
+        Args: { p_account_id: string; p_roles: string[] }
+        Returns: boolean
+      }
       increment_stem_download: {
         Args: { stem_uuid: string }
         Returns: undefined
+      }
+      is_active_account_member: {
+        Args: { p_account_id: string }
+        Returns: boolean
       }
     }
     Enums: {

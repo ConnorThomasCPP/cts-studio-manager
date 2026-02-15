@@ -7,6 +7,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { Button } from '@/components/ui/button'
@@ -40,7 +41,32 @@ type Category = {
   color: string | null
 }
 
+type AccountTheme = 'studio-default' | 'neon-space-station' | 'neon-daylight'
+
+const THEME_OPTIONS: Array<{
+  value: AccountTheme
+  label: string
+  description: string
+}> = [
+  {
+    value: 'studio-default',
+    label: 'Studio Default',
+    description: 'Current baseline studio look',
+  },
+  {
+    value: 'neon-space-station',
+    label: 'Neon Space Station',
+    description: 'Deep dark surfaces with purple/cyan neon glow',
+  },
+  {
+    value: 'neon-daylight',
+    label: 'Neon Daylight',
+    description: 'Cream daylight surfaces with vivid neon accents',
+  },
+]
+
 export default function AdminPage() {
+  const router = useRouter()
   const [locations, setLocations] = useState<Location[]>([])
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
@@ -51,6 +77,14 @@ export default function AdminPage() {
   const [apiKey, setApiKey] = useState('')
   const [savingApiKey, setSavingApiKey] = useState(false)
   const [showApiKey, setShowApiKey] = useState(false)
+  const [currentAccountName, setCurrentAccountName] = useState<string>('')
+  const [accountNameInput, setAccountNameInput] = useState('')
+  const [currentRole, setCurrentRole] = useState<'admin' | 'engineer' | 'viewer'>('viewer')
+  const [currentAccountTheme, setCurrentAccountTheme] = useState<AccountTheme>('studio-default')
+  const [savingTheme, setSavingTheme] = useState(false)
+  const [savingAccountName, setSavingAccountName] = useState(false)
+  const [deleteConfirmation, setDeleteConfirmation] = useState('')
+  const [deletingAccount, setDeletingAccount] = useState(false)
 
   const supabase = getSupabaseClient()
 
@@ -61,9 +95,10 @@ export default function AdminPage() {
   async function loadData() {
     setLoading(true)
     try {
-      const [locationsResult, categoriesResult] = await Promise.all([
+      const [locationsResult, categoriesResult, accountsResponse] = await Promise.all([
         supabase.from('locations').select('*').order('name'),
         supabase.from('categories').select('*').order('name'),
+        fetch('/api/accounts'),
       ])
 
       // Load API key separately
@@ -77,6 +112,13 @@ export default function AdminPage() {
 
       if (locationsResult.data) setLocations(locationsResult.data)
       if (categoriesResult.data) setCategories(categoriesResult.data)
+      if (accountsResponse.ok) {
+        const accountData = await accountsResponse.json()
+        setCurrentAccountName(accountData.currentAccountName || '')
+        setAccountNameInput(accountData.currentAccountName || '')
+        setCurrentRole((accountData.currentRole || 'viewer') as 'admin' | 'engineer' | 'viewer')
+        setCurrentAccountTheme((accountData.currentAccountTheme || 'studio-default') as AccountTheme)
+      }
       // if (apiKeySetting?.value) {
       //   setApiKey(typeof apiKeySetting.value === 'string' ? apiKeySetting.value : JSON.stringify(apiKeySetting.value))
       // }
@@ -215,6 +257,100 @@ export default function AdminPage() {
     }
   }
 
+  async function handleDeleteAccount() {
+    if (deleteConfirmation.trim() !== 'DELETE ACCOUNT') {
+      toast.error('Type DELETE ACCOUNT to confirm')
+      return
+    }
+
+    setDeletingAccount(true)
+    try {
+      const response = await fetch('/api/accounts/current', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ confirmationText: deleteConfirmation }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to delete account')
+      }
+
+      toast.success('Account deleted successfully')
+      setDeleteConfirmation('')
+
+      if (data.hasRemainingAccount) {
+        router.push('/dashboard')
+        router.refresh()
+      } else {
+        await supabase.auth.signOut()
+        router.push('/login')
+        router.refresh()
+      }
+    } catch (error: any) {
+      console.error('Failed to delete account:', error)
+      toast.error(error.message || 'Failed to delete account')
+    } finally {
+      setDeletingAccount(false)
+    }
+  }
+
+  async function handleSaveTheme() {
+    setSavingTheme(true)
+    try {
+      const response = await fetch('/api/accounts/current', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ theme: currentAccountTheme }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update account theme')
+      }
+
+      toast.success('Account theme updated')
+      router.refresh()
+    } catch (error: any) {
+      console.error('Failed to save account theme:', error)
+      toast.error(error.message || 'Failed to save account theme')
+    } finally {
+      setSavingTheme(false)
+    }
+  }
+
+  async function handleSaveAccountName() {
+    const trimmedName = accountNameInput.trim()
+    if (!trimmedName) {
+      toast.error('Account name is required')
+      return
+    }
+
+    setSavingAccountName(true)
+    try {
+      const response = await fetch('/api/accounts/current', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: trimmedName }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to update account name')
+      }
+
+      setCurrentAccountName(data.name || trimmedName)
+      setAccountNameInput(data.name || trimmedName)
+      toast.success('Account name updated')
+      router.refresh()
+    } catch (error: any) {
+      console.error('Failed to save account name:', error)
+      toast.error(error.message || 'Failed to save account name')
+    } finally {
+      setSavingAccountName(false)
+    }
+  }
+
   if (loading) {
     return <div className="p-8">Loading...</div>
   }
@@ -225,6 +361,32 @@ export default function AdminPage() {
         <h1 className="text-3xl font-bold">Admin Settings</h1>
         <p className="text-muted-foreground">Manage locations, categories, and system settings</p>
       </div>
+
+      {currentRole === 'admin' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Account Name</CardTitle>
+            <CardDescription>
+              Update the workspace name displayed across the app.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="space-y-2">
+              <Label htmlFor="account-name">Account Name</Label>
+              <Input
+                id="account-name"
+                value={accountNameInput}
+                onChange={(e) => setAccountNameInput(e.target.value)}
+                placeholder="Enter account name"
+                maxLength={120}
+              />
+            </div>
+            <Button onClick={handleSaveAccountName} disabled={savingAccountName}>
+              {savingAccountName ? 'Saving name...' : 'Save Account Name'}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Locations */}
       <Card>
@@ -387,6 +549,83 @@ export default function AdminPage() {
               </a>
             </p>
           </div>
+        </CardContent>
+      </Card>
+
+      {currentRole === 'admin' && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Account Theme</CardTitle>
+            <CardDescription>
+              This theme applies to everyone in {currentAccountName || 'this account'}.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-3 md:grid-cols-3">
+              {THEME_OPTIONS.map((theme) => {
+                const isSelected = currentAccountTheme === theme.value
+                return (
+                  <button
+                    key={theme.value}
+                    type="button"
+                    onClick={() => setCurrentAccountTheme(theme.value)}
+                    className={`rounded-xl border p-3 text-left transition ${
+                      isSelected ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/40'
+                    }`}
+                  >
+                    <div className="mb-3 h-16 rounded-lg border overflow-hidden">
+                      {theme.value === 'studio-default' && (
+                        <div className="h-full w-full bg-gradient-to-br from-slate-900 via-slate-800 to-slate-700" />
+                      )}
+                      {theme.value === 'neon-space-station' && (
+                        <div className="h-full w-full bg-[linear-gradient(135deg,#0e0b15,#181324_45%,#24173c_72%,#00ffd5)]" />
+                      )}
+                      {theme.value === 'neon-daylight' && (
+                        <div className="h-full w-full bg-[linear-gradient(135deg,#f8f6f1,#f2efe8_45%,#d8d5de_72%,#4ab8a4)]" />
+                      )}
+                    </div>
+                    <p className="font-medium">{theme.label}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{theme.description}</p>
+                  </button>
+                )
+              })}
+            </div>
+            <Button onClick={handleSaveTheme} disabled={savingTheme}>
+              {savingTheme ? 'Saving theme...' : 'Apply Theme'}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Danger Zone */}
+      <Card className="border-destructive/40">
+        <CardHeader>
+          <CardTitle className="text-destructive">Danger Zone</CardTitle>
+          <CardDescription>
+            Permanently delete the entire account{currentAccountName ? ` (${currentAccountName})` : ''}.
+            This removes all account data and cannot be undone.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="delete-account-confirm">
+              Type <span className="font-mono">DELETE ACCOUNT</span> to confirm
+            </Label>
+            <Input
+              id="delete-account-confirm"
+              value={deleteConfirmation}
+              onChange={(e) => setDeleteConfirmation(e.target.value)}
+              placeholder="DELETE ACCOUNT"
+              disabled={deletingAccount}
+            />
+          </div>
+          <Button
+            variant="destructive"
+            onClick={handleDeleteAccount}
+            disabled={deleteConfirmation.trim() !== 'DELETE ACCOUNT' || deletingAccount}
+          >
+            {deletingAccount ? 'Deleting account...' : 'Delete Account'}
+          </Button>
         </CardContent>
       </Card>
 

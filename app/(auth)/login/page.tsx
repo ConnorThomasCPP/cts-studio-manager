@@ -1,7 +1,7 @@
 /**
  * Login Page
  *
- * Handles user authentication with email/password or magic link
+ * Handles sign in plus account creation
  */
 
 'use client'
@@ -15,14 +15,20 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { ACCOUNT_THEME_OPTIONS, type AccountTheme } from '@/lib/account-themes'
 
 function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const redirect = searchParams.get('redirect') || '/dashboard'
 
+  const [mode, setMode] = useState<'signin' | 'create'>('signin')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
+  const [accountName, setAccountName] = useState('')
+  const [theme, setTheme] = useState<AccountTheme>('studio-default')
+  const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [magicLinkSent, setMagicLinkSent] = useState(false)
 
@@ -83,6 +89,70 @@ function LoginForm() {
     }
   }
 
+  const handleCreateAccount = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    if (password !== confirmPassword) {
+      toast.error('Passwords do not match')
+      return
+    }
+
+    if (password.length < 6) {
+      toast.error('Password must be at least 6 characters')
+      return
+    }
+
+    setLoading(true)
+    try {
+      const response = await fetch('/api/auth/signup-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          accountName,
+          theme,
+          email,
+          password,
+        }),
+      })
+
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create account')
+      }
+
+      if (data.requiresEmailConfirmation) {
+        toast.success('Account created. Check your email to confirm your address.')
+        setMode('signin')
+        setPassword('')
+        setConfirmPassword('')
+        return
+      }
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (signInError) {
+        toast.success('Account created. Please sign in.')
+        setMode('signin')
+        setPassword('')
+        setConfirmPassword('')
+        return
+      }
+
+      toast.success('Account created successfully!')
+      router.push('/dashboard')
+      router.refresh()
+    } catch (error: any) {
+      toast.error(error.message || 'An error occurred creating your account')
+      console.error(error)
+    } finally {
+      setLoading(false)
+    }
+  }
+
   if (magicLinkSent) {
     return (
       <Card>
@@ -114,13 +184,77 @@ function LoginForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Sign in</CardTitle>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            type="button"
+            variant={mode === 'signin' ? 'default' : 'outline'}
+            onClick={() => setMode('signin')}
+            disabled={loading}
+          >
+            Sign in
+          </Button>
+          <Button
+            type="button"
+            variant={mode === 'create' ? 'default' : 'outline'}
+            onClick={() => setMode('create')}
+            disabled={loading}
+          >
+            Create account
+          </Button>
+        </div>
+        <CardTitle>{mode === 'signin' ? 'Sign in' : 'Create account'}</CardTitle>
         <CardDescription>
-          Enter your credentials to access your account
+          {mode === 'signin'
+            ? 'Enter your credentials to access your account'
+            : 'Set up your workspace and owner account'}
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleEmailLogin} className="space-y-4">
+        <form onSubmit={mode === 'signin' ? handleEmailLogin : handleCreateAccount} className="space-y-4">
+          {mode === 'create' && (
+            <>
+              <div className="space-y-2">
+                <Label htmlFor="name">Full Name</Label>
+                <Input
+                  id="name"
+                  type="text"
+                  placeholder="John Doe"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="account-name">Workspace Name</Label>
+                <Input
+                  id="account-name"
+                  type="text"
+                  placeholder="Connor Studios"
+                  value={accountName}
+                  onChange={(e) => setAccountName(e.target.value)}
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="theme">Theme</Label>
+                <select
+                  id="theme"
+                  value={theme}
+                  onChange={(e) => setTheme(e.target.value as AccountTheme)}
+                  className="w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+                  disabled={loading}
+                >
+                  {ACCOUNT_THEME_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
+          )}
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
             <Input
@@ -136,12 +270,14 @@ function LoginForm() {
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label htmlFor="password">Password</Label>
-              <Link
-                href="/forgot-password"
-                className="text-xs text-primary hover:underline"
-              >
-                Forgot password?
-              </Link>
+              {mode === 'signin' && (
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              )}
             </div>
             <Input
               id="password"
@@ -152,38 +288,77 @@ function LoginForm() {
               disabled={loading}
             />
           </div>
+
+          {mode === 'create' && (
+            <div className="space-y-2">
+              <Label htmlFor="confirm-password">Confirm Password</Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                disabled={loading}
+                minLength={6}
+              />
+            </div>
+          )}
+
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? 'Signing in...' : 'Sign in'}
+            {loading
+              ? mode === 'signin' ? 'Signing in...' : 'Creating account...'
+              : mode === 'signin' ? 'Sign in' : 'Create account'}
           </Button>
         </form>
 
-        <div className="relative my-6">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t" />
-          </div>
-          <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-background px-2 text-muted-foreground">
-              Or continue with
-            </span>
-          </div>
-        </div>
+        {mode === 'signin' && (
+          <>
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with
+                </span>
+              </div>
+            </div>
 
-        <Button
-          variant="outline"
-          onClick={handleMagicLink}
-          disabled={loading || !email}
-          className="w-full"
-        >
-          {loading ? 'Sending...' : 'Send magic link'}
-        </Button>
+            <Button
+              variant="outline"
+              onClick={handleMagicLink}
+              disabled={loading || !email}
+              className="w-full"
+            >
+              {loading ? 'Sending...' : 'Send magic link'}
+            </Button>
+          </>
+        )}
       </CardContent>
       <CardFooter className="flex justify-center">
-        <p className="text-sm text-muted-foreground">
-          Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-primary hover:underline font-medium">
-            Sign up
-          </Link>
-        </p>
+        {mode === 'signin' ? (
+          <p className="text-sm text-muted-foreground">
+            Need a new workspace?{' '}
+            <button
+              type="button"
+              className="text-primary hover:underline font-medium"
+              onClick={() => setMode('create')}
+            >
+              Create account
+            </button>
+          </p>
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            Already have an account?{' '}
+            <button
+              type="button"
+              className="text-primary hover:underline font-medium"
+              onClick={() => setMode('signin')}
+            >
+              Sign in
+            </button>
+          </p>
+        )}
       </CardFooter>
     </Card>
   )
