@@ -52,7 +52,7 @@ export class CalendarService {
       .order('created_at', { ascending: false })
 
     if (error) throw error
-    return data || []
+    return (data as CalendarConnection[]) || []
   }
 
   /**
@@ -69,7 +69,7 @@ export class CalendarService {
       if (error.code === 'PGRST116') return null // Not found
       throw error
     }
-    return data
+    return data as CalendarConnection
   }
 
   /**
@@ -91,7 +91,7 @@ export class CalendarService {
       .single()
 
     if (error) throw error
-    return data
+    return data as CalendarConnection
   }
 
   /**
@@ -109,7 +109,7 @@ export class CalendarService {
       .single()
 
     if (error) throw error
-    return data
+    return data as CalendarConnection
   }
 
   /**
@@ -134,7 +134,7 @@ export class CalendarService {
       .eq('session_id', sessionId)
 
     if (error) throw error
-    return data || []
+    return (data as CalendarSync[]) || []
   }
 
   /**
@@ -209,8 +209,8 @@ export class CalendarService {
     if (!connection) throw new Error('Calendar connection not found')
 
     // Get session attendees
-    const attendees = await this.getSessionAttendees(sessionId)
-    const attendeeEmails = attendees.map(user => user.email).filter(Boolean) as string[]
+    // TODO: Fetch email addresses from auth.users for calendar invites
+    const attendeeEmails: string[] = []
 
     // Get the appropriate provider client
     const provider = await this.getProviderClient(connection)
@@ -253,7 +253,7 @@ export class CalendarService {
           .single()
 
         if (error) throw error
-        return data
+        return data as CalendarSync
       } else {
         // Create new event
         const eventId = await provider.createEvent(calendarEvent)
@@ -274,7 +274,7 @@ export class CalendarService {
           .single()
 
         if (error) throw error
-        return data
+        return data as CalendarSync
       }
     } catch (error: any) {
       // Mark sync as error
@@ -418,7 +418,7 @@ export class CalendarService {
       .single()
 
     if (error) throw error
-    return data
+    return data as CalendarConnection
   }
 
   /**

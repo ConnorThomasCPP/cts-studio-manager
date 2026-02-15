@@ -34,8 +34,7 @@ export async function POST(request: NextRequest) {
       try {
         const sync = await calendarService.syncSessionToCalendar(
           sessionId,
-          connectionId,
-          attendeeUserIds || []
+          connectionId
         )
         results.push({ connectionId, success: true, sync })
       } catch (error: any) {

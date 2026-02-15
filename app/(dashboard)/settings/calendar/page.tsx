@@ -206,7 +206,7 @@ export default function CalendarSettingsPage() {
                 <div className="flex items-center gap-3 ml-4">
                   <div className="flex items-center gap-2">
                     <Switch
-                      checked={connection.sync_enabled}
+                      checked={connection.sync_enabled ?? false}
                       onCheckedChange={(checked) =>
                         handleToggleSync(connection.id, checked)
                       }

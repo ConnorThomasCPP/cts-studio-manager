@@ -119,7 +119,8 @@ export default function SessionCalendar() {
 
   // Custom event style based on session status
   const eventStyleGetter = useCallback((event: CalendarEvent) => {
-    const backgroundColor = STATUS_COLORS[event.resource.status] || STATUS_COLORS.planned
+    const status = event.resource.status as keyof typeof STATUS_COLORS
+    const backgroundColor = STATUS_COLORS[status] || STATUS_COLORS.planned
     return {
       style: {
         backgroundColor,
