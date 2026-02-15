@@ -415,7 +415,7 @@ export default function NewSessionPage() {
                         htmlFor={`attendee-${user.id}`}
                         className="text-sm font-normal cursor-pointer flex items-center gap-2"
                       >
-                        <span>{user.name || user.email}</span>
+                        <span>{user.name}</span>
                         {user.role && (
                           <span className="text-xs text-muted-foreground">
                             ({user.role})
