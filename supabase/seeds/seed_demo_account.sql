@@ -17,6 +17,12 @@ DECLARE
   v_loc_live_room UUID;
   v_asset_1 UUID;
   v_asset_2 UUID;
+  v_track_1 UUID;
+  v_track_2 UUID;
+  v_track_3 UUID;
+  v_stem_1 UUID;
+  v_stem_2 UUID;
+  v_stem_3 UUID;
 BEGIN
   SELECT id
   INTO v_account_id
@@ -167,6 +173,146 @@ BEGIN
   RETURNING id INTO v_project_podcast;
 
   -- -------------------------------------------------------------------------
+  -- Tracks + stems (placeholder audio paths)
+  -- -------------------------------------------------------------------------
+  INSERT INTO public.tracks (
+    account_id, project_id, name, description, status, track_no, bpm, key, duration, created_by
+  )
+  VALUES
+    (
+      v_account_id,
+      v_project_album,
+      'Midnight Echoes',
+      'Lead single with layered vocal harmonies',
+      'mixing',
+      1,
+      128,
+      'A minor',
+      214,
+      v_owner_user_id
+    )
+  RETURNING id INTO v_track_1;
+
+  INSERT INTO public.tracks (
+    account_id, project_id, name, description, status, track_no, bpm, key, duration, created_by
+  )
+  VALUES
+    (
+      v_account_id,
+      v_project_album,
+      'Afterglow',
+      'Second single with wider stereo image',
+      'editing',
+      2,
+      122,
+      'F major',
+      201,
+      v_owner_user_id
+    )
+  RETURNING id INTO v_track_2;
+
+  INSERT INTO public.tracks (
+    account_id, project_id, name, description, status, track_no, bpm, key, duration, created_by
+  )
+  VALUES
+    (
+      v_account_id,
+      v_project_podcast,
+      'Episode 12 Edit',
+      'Podcast dialogue tidy-up and levelling',
+      'mastering',
+      1,
+      NULL,
+      NULL,
+      1840,
+      v_owner_user_id
+    )
+  RETURNING id INTO v_track_3;
+
+  INSERT INTO public.stems (
+    account_id, track_id, name, file_path, mime_type, type, sort_order, duration, file_size, color, created_by
+  )
+  VALUES
+    (
+      v_account_id,
+      v_track_1,
+      'Lead Vocal',
+      'seed/demo-account/midnight-echoes/lead-vocal.wav',
+      'audio/wav',
+      'vocals',
+      1,
+      214,
+      25430012,
+      '#f472b6',
+      v_owner_user_id
+    )
+  RETURNING id INTO v_stem_1;
+
+  INSERT INTO public.stems (
+    account_id, track_id, name, file_path, mime_type, type, sort_order, duration, file_size, color, created_by
+  )
+  VALUES
+    (
+      v_account_id,
+      v_track_1,
+      'Bass DI',
+      'seed/demo-account/midnight-echoes/bass-di.wav',
+      'audio/wav',
+      'bass',
+      2,
+      214,
+      18145008,
+      '#60a5fa',
+      v_owner_user_id
+    )
+  RETURNING id INTO v_stem_2;
+
+  INSERT INTO public.stems (
+    account_id, track_id, name, file_path, mime_type, type, sort_order, duration, file_size, color, created_by
+  )
+  VALUES
+    (
+      v_account_id,
+      v_track_3,
+      'Dialogue Main',
+      'seed/demo-account/neon-talks/episode-12-dialogue.wav',
+      'audio/wav',
+      'other',
+      1,
+      1840,
+      94230044,
+      '#34d399',
+      v_owner_user_id
+    )
+  RETURNING id INTO v_stem_3;
+
+  INSERT INTO public.stem_comments (
+    account_id, stem_id, user_id, timestamp, content
+  )
+  VALUES
+    (
+      v_account_id,
+      v_stem_1,
+      v_owner_user_id,
+      43,
+      'Please tighten this phrase and brighten the top end from bar 9.'
+    ),
+    (
+      v_account_id,
+      v_stem_2,
+      v_owner_user_id,
+      58,
+      'Great tone. Add a touch more compression for consistency.'
+    ),
+    (
+      v_account_id,
+      v_stem_3,
+      v_owner_user_id,
+      122,
+      'Breath edit needed here before final export.'
+    );
+
+  -- -------------------------------------------------------------------------
   -- Sessions
   -- -------------------------------------------------------------------------
   INSERT INTO public.sessions (
@@ -286,7 +432,7 @@ BEGIN
       v_asset_2,
       NOW() - INTERVAL '1 hour',
       'good',
-      'Checked out for tomorrow prep'
+      'Checked out for tomorrow preparation'
     );
 
   INSERT INTO public.transactions (
@@ -302,7 +448,7 @@ BEGIN
       'good',
       'available',
       'checked_out',
-      'Prep checkout for podcast batch session',
+      'Preparation checkout for podcast batch session',
       jsonb_build_object('seed', true, 'source', 'seed_demo_account.sql')
     );
 

@@ -22,11 +22,14 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { toast } from 'sonner'
+import { ACCOUNT_THEME_OPTIONS, type AccountTheme } from '@/lib/account-themes'
 
 export default function SignUpPage() {
   const router = useRouter()
 
   const [name, setName] = useState('')
+  const [accountName, setAccountName] = useState('')
+  const [theme, setTheme] = useState<AccountTheme>('studio-default')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
@@ -50,35 +53,40 @@ export default function SignUpPage() {
     setLoading(true)
 
     try {
-      // Sign up the user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            name, // Store name in auth metadata
-          },
-        },
+      const response = await fetch('/api/auth/signup-account', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          accountName,
+          theme,
+          email,
+          password,
+        }),
       })
 
-      if (authError) {
-        toast.error(authError.message)
+      const data = await response.json()
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to create account')
+      }
+
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
+
+      if (signInError) {
+        toast.success('Account created. Please sign in.')
+        router.push('/login')
         return
       }
 
-      if (authData.user) {
-        toast.success('Account created! Check your email to confirm.')
-
-        // Note: User profile will need to be created manually by an admin
-        // or through a post-signup hook in Supabase
-        toast.info('Contact an admin to set your account role', {
-          duration: 8000,
-        })
-
-        router.push('/login')
-      }
-    } catch (error) {
-      toast.error('An error occurred during sign up')
+      toast.success('Account created successfully.')
+      router.push('/dashboard')
+      router.refresh()
+    } catch (error: unknown) {
+      const message = error instanceof Error ? error.message : 'An error occurred during sign up'
+      toast.error(message)
       console.error(error)
     } finally {
       setLoading(false)
@@ -106,6 +114,34 @@ export default function SignUpPage() {
               required
               disabled={loading}
             />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="account-name">Workspace Name</Label>
+            <Input
+              id="account-name"
+              type="text"
+              placeholder="Your Studio Name"
+              value={accountName}
+              onChange={(e) => setAccountName(e.target.value)}
+              required
+              disabled={loading}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="theme">Theme</Label>
+            <select
+              id="theme"
+              value={theme}
+              onChange={(e) => setTheme(e.target.value as AccountTheme)}
+              className="w-full h-9 rounded-md border border-input bg-transparent px-3 text-sm"
+              disabled={loading}
+            >
+              {ACCOUNT_THEME_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email</Label>
