@@ -17,8 +17,17 @@ import {
   ChevronDown,
   ChevronRight,
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 
-const navItems = [
+type NavItem = {
+  to: string;
+  icon: LucideIcon;
+  label: string;
+  submenu?: Array<{ to: string; icon?: LucideIcon; label: string }>;
+  adminOnly?: boolean;
+};
+
+const navItems: NavItem[] = [
   { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   {
     to: "/assets",
@@ -34,18 +43,20 @@ const navItems = [
   { to: "/projects", icon: Folder, label: "Projects" },
   { to: "/tracks", icon: Music, label: "Tracks" },
   { to: "/transactions", icon: ScrollText, label: "Transactions" },
-  { to: "/users", icon: UserCog, label: "Team" },
+  { to: "/users", icon: UserCog, label: "Team", adminOnly: true },
   { to: "/admin", icon: Settings, label: "Settings" },
 ];
 
 interface AppSidebarProps {
   collapsed: boolean;
+  userRole?: string;
   onToggle?: () => void;
 }
 
-export function AppSidebar({ collapsed }: AppSidebarProps) {
+export function AppSidebar({ collapsed, userRole }: AppSidebarProps) {
   const pathname = usePathname();
   const [expandedItems, setExpandedItems] = useState<string[]>(["/assets"]);
+  const visibleNavItems = navItems.filter((item) => !item.adminOnly || userRole === "admin");
 
   const toggleExpanded = (to: string) => {
     setExpandedItems(prev =>
@@ -78,7 +89,7 @@ export function AppSidebar({ collapsed }: AppSidebarProps) {
 
       {/* Nav */}
       <nav className="flex-1 space-y-1 p-3">
-        {navItems.map((item) => {
+        {visibleNavItems.map((item) => {
           const isActive = pathname === item.to || pathname?.startsWith(item.to + "/");
           const isExpanded = expandedItems.includes(item.to);
           const hasSubmenu = item.submenu && item.submenu.length > 0;
@@ -109,7 +120,7 @@ export function AppSidebar({ collapsed }: AppSidebarProps) {
                   </button>
                   {!collapsed && isExpanded && (
                     <div className="ml-4 mt-1 space-y-1">
-                      {item.submenu.map((subitem) => {
+                      {item.submenu?.map((subitem) => {
                         const isSubActive = pathname === subitem.to;
                         return (
                           <Link

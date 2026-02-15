@@ -139,46 +139,39 @@ export default function ScanPage() {
 
     setLoading(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      console.log('User:', user)
-      if (!user) throw new Error('Not authenticated')
+      const { data: activeSessions, error: sessionError } = await supabase
+        .from('sessions')
+        .select('id, session_name')
+        .eq('status', 'active')
+        .order('start_time', { ascending: false })
+        .limit(1)
 
-      // Update asset status
-      const { error: updateError } = await supabase
-        .from('assets')
-        .update({ status: 'checked_out' })
-        .eq('id', scannedAsset.id)
+      if (sessionError) {
+        throw sessionError
+      }
 
-      console.log('Update result:', { updateError })
-      if (updateError) {
-        console.error('Update error details:', updateError)
-        toast.error(`Update failed: ${updateError.message}`)
+      const activeSession = activeSessions?.[0]
+      if (!activeSession) {
+        toast.error('No active session found. Start a session before checking out assets.')
         return
       }
 
-      // Record transaction
-      const { error: transactionError } = await supabase
-        .from('transactions')
-        .insert({
-          asset_id: scannedAsset.id,
-          type: 'check_out',
-          user_id: user.id,
-          note: 'Checked out via mobile scanner'
-        })
+      const { data: result, error: rpcError } = await supabase.rpc('check_out_asset', {
+        p_asset_id: scannedAsset.id,
+        p_session_id: activeSession.id,
+        p_note: `Checked out via mobile scanner (${activeSession.session_name})`,
+      })
 
-      console.log('Transaction result:', { transactionError })
-      if (transactionError) {
-        console.error('Transaction error details:', transactionError)
-        toast.error(`Transaction failed: ${transactionError.message}`)
-        return
+      if (rpcError) {
+        throw rpcError
       }
 
-      toast.success(`${scannedAsset.name} checked out!`)
-      setScannedAsset({ ...scannedAsset, status: 'checked_out' })
+      const newStatus = (result as { new_status?: string } | null)?.new_status || 'checked_out'
+      setScannedAsset({ ...scannedAsset, status: newStatus })
+
+      toast.success(`${scannedAsset.name} checked out to "${activeSession.session_name}"`)
     } catch (error: any) {
       console.error('Check out error:', error)
-      console.error('Error type:', typeof error)
-      console.error('Error keys:', Object.keys(error || {}))
       toast.error(error?.message || 'Failed to check out asset')
     } finally {
       setLoading(false)
@@ -191,46 +184,21 @@ export default function ScanPage() {
 
     setLoading(true)
     try {
-      const { data: { user } } = await supabase.auth.getUser()
-      console.log('User:', user)
-      if (!user) throw new Error('Not authenticated')
+      const { data: result, error: rpcError } = await supabase.rpc('check_in_asset', {
+        p_asset_id: scannedAsset.id,
+        p_note: 'Checked in via mobile scanner',
+      })
 
-      // Update asset status
-      const { error: updateError } = await supabase
-        .from('assets')
-        .update({ status: 'available' })
-        .eq('id', scannedAsset.id)
-
-      console.log('Update result:', { updateError })
-      if (updateError) {
-        console.error('Update error details:', updateError)
-        toast.error(`Update failed: ${updateError.message}`)
-        return
+      if (rpcError) {
+        throw rpcError
       }
 
-      // Record transaction
-      const { error: transactionError } = await supabase
-        .from('transactions')
-        .insert({
-          asset_id: scannedAsset.id,
-          type: 'check_in',
-          user_id: user.id,
-          note: 'Checked in via mobile scanner'
-        })
-
-      console.log('Transaction result:', { transactionError })
-      if (transactionError) {
-        console.error('Transaction error details:', transactionError)
-        toast.error(`Transaction failed: ${transactionError.message}`)
-        return
-      }
+      const newStatus = (result as { new_status?: string } | null)?.new_status || 'available'
+      setScannedAsset({ ...scannedAsset, status: newStatus })
 
       toast.success(`${scannedAsset.name} checked in!`)
-      setScannedAsset({ ...scannedAsset, status: 'available' })
     } catch (error: any) {
       console.error('Check in error:', error)
-      console.error('Error type:', typeof error)
-      console.error('Error keys:', Object.keys(error || {}))
       toast.error(error?.message || 'Failed to check in asset')
     } finally {
       setLoading(false)

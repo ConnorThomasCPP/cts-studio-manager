@@ -48,7 +48,11 @@ export function AppLayout({ children, user }: AppLayoutProps) {
 
   return (
     <div className="min-h-screen bg-background">
-      <AppSidebar collapsed={collapsed} onToggle={() => setCollapsed(!collapsed)} />
+      <AppSidebar
+        collapsed={collapsed}
+        userRole={user?.role}
+        onToggle={() => setCollapsed(!collapsed)}
+      />
       <MobileNav />
 
       {/* Header bar */}

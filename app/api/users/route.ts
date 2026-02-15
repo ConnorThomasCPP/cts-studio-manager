@@ -40,15 +40,31 @@ export async function GET() {
 
     if (error) throw error
 
-    // Use admin client to fetch emails from auth.users
+    // Use admin client to fetch emails from auth.users (paginated)
     const adminClient = createAdminClient()
-    const { data: { users: authUsers }, error: authError } = await adminClient.auth.admin.listUsers()
+    const authUsers: Array<{ id: string; email?: string; last_sign_in_at?: string | null }> = []
+    const perPage = 200
+    let page = 1
+    let hasMore = true
 
-    if (authError) throw authError
+    while (hasMore) {
+      const { data, error: authError } = await adminClient.auth.admin.listUsers({
+        page,
+        perPage,
+      })
+
+      if (authError) throw authError
+
+      const batch = data?.users || []
+      authUsers.push(...batch)
+
+      hasMore = batch.length === perPage
+      page += 1
+    }
 
     // Build email lookup map
     const emailMap = new Map<string, { email: string; last_sign_in_at: string | null }>()
-    for (const authUser of authUsers || []) {
+    for (const authUser of authUsers) {
       emailMap.set(authUser.id, {
         email: authUser.email || '',
         last_sign_in_at: authUser.last_sign_in_at || null,
