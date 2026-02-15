@@ -45,6 +45,13 @@ export default async function AssetsPage({
 
   const { data: assets } = await query
 
+  // Transform null to undefined for TypeScript compatibility
+  const transformedAssets = assets?.map(asset => ({
+    ...asset,
+    categories: asset.categories ?? undefined,
+    locations: asset.locations ?? undefined,
+  })) ?? []
+
   // Get categories for filter
   const { data: categories } = await supabase
     .from('categories')
@@ -112,8 +119,8 @@ export default async function AssetsPage({
       </Card>
 
       {/* Assets Table */}
-      {assets && assets.length > 0 ? (
-        <AssetsTable assets={assets} />
+      {transformedAssets.length > 0 ? (
+        <AssetsTable assets={transformedAssets} />
       ) : (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
