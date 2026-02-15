@@ -8,6 +8,7 @@ import {
   Package,
   CalendarClock,
   Users,
+  UserCog,
   Music,
   ScanBarcode,
   ScrollText,
@@ -33,6 +34,7 @@ const navItems = [
   { to: "/projects", icon: Folder, label: "Projects" },
   { to: "/tracks", icon: Music, label: "Tracks" },
   { to: "/transactions", icon: ScrollText, label: "Transactions" },
+  { to: "/users", icon: UserCog, label: "Team" },
   { to: "/admin", icon: Settings, label: "Settings" },
 ];
 

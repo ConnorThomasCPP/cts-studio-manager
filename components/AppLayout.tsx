@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, User, LogOut, Settings } from "lucide-react";
+import { Menu, User, Users, LogOut, Settings } from "lucide-react";
 import { AppSidebar, MobileNav } from "./AppSidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import {
@@ -101,6 +101,14 @@ export function AppLayout({ children, user }: AppLayoutProps) {
                   Calendar Settings
                 </Link>
               </DropdownMenuItem>
+              {user.role === 'admin' && (
+                <DropdownMenuItem asChild>
+                  <Link href="/users" className="cursor-pointer">
+                    <Users className="mr-2 h-4 w-4" />
+                    Team Management
+                  </Link>
+                </DropdownMenuItem>
+              )}
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
                 <LogOut className="mr-2 h-4 w-4" />

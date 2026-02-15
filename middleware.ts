@@ -46,6 +46,12 @@ export async function middleware(request: NextRequest) {
     '/scan',
     '/transactions',
     '/admin',
+    '/users',
+    '/clients',
+    '/projects',
+    '/tracks',
+    '/profile',
+    '/settings',
   ]
 
   const isProtectedRoute = protectedPaths.some((path) =>
